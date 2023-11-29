@@ -47,9 +47,9 @@ public class loginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            finish();
                             startActivity(new Intent(loginActivity.this, mainActivity.class));
                             Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                            finish();
                         } else {
                             Toast.makeText(loginActivity.this, "Error", Toast.LENGTH_SHORT).show();
                         }
@@ -58,6 +58,7 @@ public class loginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(loginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
                     }
                 });
             }
