@@ -13,6 +13,12 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".contrasenaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.theme.contrasenaActivity"
+            android:exported="false" />
+        <activity
             android:name=".mainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"

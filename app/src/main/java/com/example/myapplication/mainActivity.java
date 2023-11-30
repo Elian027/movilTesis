@@ -32,22 +32,27 @@ public class mainActivity extends AppCompatActivity {
         apellidoTextView = findViewById(R.id.apellido);
         emailTextView = findViewById(R.id.email);
         celularTextView = findViewById(R.id.celular);
+
+        nombreTextView.setText("prueba");
+        apellidoTextView.setText("prueba");
+        emailTextView.setText("prueba");
+        celularTextView.setText("prueba");
+
         btn_cerrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Cierra sesión en Firebase
                 mAuth.signOut();
-
                 Intent intent = new Intent(mainActivity.this, loginActivity.class);
                 startActivity(intent);
                 finish();
             }
 
         });
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            DocumentReference userRef = db.collection("usuarios").document(userId);
+        FirebaseUser usuario = mAuth.getCurrentUser();
+        if (usuario != null) {
+            String usuarioId = usuario.getUid();
+            DocumentReference userRef = db.collection("usuarios").document(usuarioId);
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(Task<DocumentSnapshot> task) {
