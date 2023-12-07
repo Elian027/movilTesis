@@ -140,7 +140,7 @@
 
             <!-- Entradas de texto para el formulario -->
             <EditText
-                android:id="@+id/etContraseñaActual"
+                android:id="@+id/pass_actual"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
@@ -148,7 +148,7 @@
                 android:inputType="textPassword"/>
 
             <EditText
-                android:id="@+id/etNuevaContraseña"
+                android:id="@+id/pass_nueva"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"
@@ -156,7 +156,7 @@
                 android:inputType="textPassword"/>
 
             <EditText
-                android:id="@+id/etConfirmarContraseña"
+                android:id="@+id/pass_confirmar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="17dp"

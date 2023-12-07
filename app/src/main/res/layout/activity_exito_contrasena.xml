@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".mainActivity">
 
-    <!-- Rectángulo con flecha para Cambio de Contraseña -->
+    <!-- Rectángulo Cambio de Contraseña -->
     <LinearLayout
         android:id="@+id/rectanguloCambioContraseña"
         android:layout_width="match_parent"
@@ -29,92 +29,16 @@
             android:layout_gravity="center_vertical"
             />
     </LinearLayout>
-
-    <!-- CardView con 2 columnas para Información personal -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- Columna izquierda con una imagen -->
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground" />
-
-            <!-- Columna derecha con información personal -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Información personal"
-                    android:textStyle="bold"/>
-
-                <!-- Nombre y Apellido -->
-                <TextView
-                    android:id="@+id/nombre"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="" />
-
-                <TextView
-                    android:id="@+id/apellido"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="" />
-
-                <!-- Email -->
-                <TextView
-                    android:id="@+id/email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="" />
-
-                <!-- Celular -->
-                <TextView
-                    android:id="@+id/celular"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="" />
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewCambioExitoso"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rectanguloCambioContraseña"
         app:layout_constraintBottom_toBottomOf="parent"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp">
@@ -133,7 +57,7 @@
                 android:gravity="center"
                 android:textSize="45sp"
                 android:textStyle="bold"
-                android:paddingTop="60dp"
+                android:paddingTop="100dp"
                 android:paddingBottom="20dp" />
 
             <!-- Botón "Continuar" -->

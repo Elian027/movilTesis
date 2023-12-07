@@ -50,14 +50,8 @@ public class loginActivity extends AppCompatActivity {
                             Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
-                            Toast.makeText(loginActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(loginActivity.this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(loginActivity.this, "Error al iniciar sesión", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
                     }
                 });
             }
