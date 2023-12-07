@@ -60,8 +60,7 @@
                     android:id="@+id/apellido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Apellido" />
+                    android:layout_marginTop="8dp" />
 
                 <!-- Email -->
                 <TextView

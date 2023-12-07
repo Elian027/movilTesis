@@ -17,19 +17,12 @@
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Icono de flecha hacia atrás -->
-        <ImageView
-            android:id="@+id/atras"
-            android:layout_width="40dp"
-            android:layout_height="30dp"
-            android:src="@drawable/arrow_left" />
-
         <!-- Texto "Cambio de contraseña" -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cambio de contraseña"
+            android:text="Cambio de contraseña exitoso"
             android:textColor="#FFFFFF"
             android:gravity="center"
             android:textSize="18sp"
@@ -113,80 +106,44 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewFormulario"
+        android:id="@+id/cardViewCambioExitoso"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Título del formulario -->
+            <!-- Mensaje de cambio de contraseña exitoso -->
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cambio de contraseña"
-                android:textSize="34sp"
+                android:text="Cambio de contraseña exitoso"
+                android:gravity="center"
+                android:textSize="45sp"
                 android:textStyle="bold"
-                android:layout_gravity="center"/>
+                android:paddingTop="60dp"
+                android:paddingBottom="20dp" />
 
-            <!-- Entradas de texto para el formulario -->
-            <EditText
-                android:id="@+id/etContraseñaActual"
+            <!-- Botón "Continuar" -->
+            <Button
+                android:id="@+id/continuar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
-                android:hint="Contraseña actual"
-                android:inputType="textPassword"/>
-
-            <EditText
-                android:id="@+id/etNuevaContraseña"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
-                android:hint="Nueva contraseña"
-                android:inputType="textPassword"/>
-
-            <EditText
-                android:id="@+id/etConfirmarContraseña"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
-                android:hint="Confirmar nueva contraseña"
-                android:inputType="textPassword"/>
-
-            <!-- Botones "Cancelar" y "Guardar" -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp">
-
-                <Button
-                    android:id="@+id/cancelar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cancelar"
-                    android:backgroundTint="#E54D71" />
-
-                <Button
-                    android:id="@+id/guardar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Guardar"
-                    android:backgroundTint="#40AD55" />
-            </LinearLayout>
-
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#40AD55"
+                android:text="Continuar" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

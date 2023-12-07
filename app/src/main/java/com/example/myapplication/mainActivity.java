@@ -17,7 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class mainActivity extends AppCompatActivity {
-    Button btn_cerrar;
+    Button btn_cerrar, btn_cambiar;
     FirebaseAuth mAuth;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
 
@@ -28,23 +28,13 @@ public class mainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         btn_cerrar = findViewById(R.id.cerrar);
+        btn_cambiar = findViewById(R.id.cambiar);
         FirebaseFirestore db;
         nombreTextView = findViewById(R.id.nombre);
         apellidoTextView = findViewById(R.id.apellido);
         emailTextView = findViewById(R.id.email);
         celularTextView = findViewById(R.id.celular);
 
-        btn_cerrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Cierra sesión en Firebase
-                mAuth.signOut();
-                Intent intent = new Intent(mainActivity.this, loginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-
-        });
         db = FirebaseFirestore.getInstance();
         FirebaseUser usuario = mAuth.getCurrentUser();
         if (usuario != null) {
@@ -70,6 +60,26 @@ public class mainActivity extends AppCompatActivity {
             });
 
         }
+        btn_cerrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Cierra sesión en Firebase
+                mAuth.signOut();
+                Intent main_to_log = new Intent(mainActivity.this, loginActivity.class);
+                startActivity(main_to_log);
+                finish();
+            }
+
+        });
+
+        btn_cambiar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent main_to_pass = new Intent(mainActivity.this, contrasenaActivity.class);
+                startActivity(main_to_pass);
+                finish();
+            }
+        });
 
     }
 }
