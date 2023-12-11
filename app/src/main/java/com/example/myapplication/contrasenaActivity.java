@@ -97,8 +97,8 @@ public class contrasenaActivity extends AppCompatActivity {
                 String passConfirmar = contrasenaConf.getText().toString();
 
                 // Verificar la contraseña actual con Firebase Authentication
-                String userUid = mAuth.getCurrentUser().getUid();
-                DocumentReference userDocRef = db.collection("usuarios").document("wSaPsMKjV1k2FRnAfZFS");
+                String usuarioID = mAuth.getCurrentUser().getUid();
+                DocumentReference userDocRef = db.collection("usuarios").document(usuarioID);
 
                 userDocRef.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

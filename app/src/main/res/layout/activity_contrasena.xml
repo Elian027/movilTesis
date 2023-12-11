@@ -33,8 +33,7 @@
             android:textColor="#FFFFFF"
             android:gravity="center"
             android:textSize="18sp"
-            android:layout_gravity="center_vertical"
-            />
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
     <!-- CardView con 2 columnas para Información personal -->
