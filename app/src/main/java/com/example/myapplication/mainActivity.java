@@ -15,7 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class mainActivity extends AppCompatActivity {
-    Button btn_cerrar, btn_cambiar;
+    Button btn_cerrar, btn_cambiar, btn_editar;
     FirebaseAuth mAuth;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
     String usuarioId;
@@ -28,6 +28,7 @@ public class mainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         btn_cerrar = findViewById(R.id.cerrar);
         btn_cambiar = findViewById(R.id.cambiar);
+        btn_editar = findViewById(R.id.editar);
         nombreTextView = findViewById(R.id.nombre);
         apellidoTextView = findViewById(R.id.apellido);
         emailTextView = findViewById(R.id.email);
@@ -55,6 +56,15 @@ public class mainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        btn_editar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent main_to_edit = new Intent(mainActivity.this, editar_perfilActivity.class);
+                startActivity(main_to_edit);
+                finish();
+            }
+        });
 
         btn_cerrar.setOnClickListener(new View.OnClickListener() {
             @Override

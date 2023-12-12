@@ -36,7 +36,7 @@ public class contrasenaActivity extends AppCompatActivity {
         // Obtén el usuario actual
         FirebaseUser usuarioActual = mAuth.getCurrentUser();
 
-        ImageView imageViewAtras = findViewById(R.id.atras);
+        ImageView btn_atras = findViewById(R.id.atras);
         Button btn_cancelar = findViewById(R.id.cancelar);
         Button btn_guardar = findViewById(R.id.guardar);
         nombreTextView = findViewById(R.id.nombre);
@@ -71,7 +71,7 @@ public class contrasenaActivity extends AppCompatActivity {
             });
         }
 
-        imageViewAtras.setOnClickListener(new View.OnClickListener() {
+        btn_atras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent pass_to_main = new Intent(contrasenaActivity.this, mainActivity.class);
