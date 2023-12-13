@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".editar_perfilActivity">
 
-    <!-- Rectángulo con flecha para Cambio de Contraseña -->
+
     <LinearLayout
         android:id="@+id/rectangulo"
         android:layout_width="match_parent"
@@ -106,11 +106,24 @@
                 android:layout_height="wrap_content"
                 android:text="Foto" />
 
-            <ImageView
-                android:id="@+id/camara"
-                android:layout_width="40dp"
-                android:layout_height="30dp"
-                android:src="@drawable/camara" />
+            <Button
+                android:id="@+id/seleccionar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar archivo"
+                android:layout_gravity="left"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#808080	" />
+            <TextView
+                android:id="@+id/textViewArchivo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:text=""
+                app:layout_constraintBaseline_toBaselineOf="@id/seleccionar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/seleccionar" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

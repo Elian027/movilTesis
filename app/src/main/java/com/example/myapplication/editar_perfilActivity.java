@@ -4,13 +4,18 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,16 +24,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class editar_perfilActivity extends AppCompatActivity {
-    Button btn_guardar, btn_cancelar;
+    Button btn_guardar, btn_cancelar, btn_seleccionar;
     FirebaseAuth mAuth;
     FirebaseFirestore db;
     EditText nombreET, apellidoET, emailET, celularET;
     ActivityResultLauncher<Intent> cameraLauncher;
     String usuarioID;
+    TextView archivo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +47,7 @@ public class editar_perfilActivity extends AppCompatActivity {
         usuarioID = mAuth.getCurrentUser().getUid();
 
         ImageView btn_atras = findViewById(R.id.atras);
-        ImageView btn_camara = findViewById(R.id.camara);
+        //ImageView btn_camara = findViewById(R.id.camara);
 
         nombreET = findViewById(R.id.editTextNombre);
         apellidoET = findViewById(R.id.editTextApellido);
@@ -49,6 +56,9 @@ public class editar_perfilActivity extends AppCompatActivity {
 
         btn_cancelar = findViewById(R.id.botonCancelar);
         btn_guardar = findViewById(R.id.botonGuardar);
+        btn_seleccionar = findViewById(R.id.seleccionar);
+
+        archivo = findViewById(R.id.textViewArchivo);
 
         obtenerInformacionUsuario();
 
@@ -64,16 +74,18 @@ public class editar_perfilActivity extends AppCompatActivity {
         btn_cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // No hagas nada o vuelve a cargar la información original
+                /*Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
+                startActivity(edit_to_main);*/
+                finish();
             }
         });
 
-        btn_camara.setOnClickListener(new View.OnClickListener() {
+        /*btn_camara.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 camara();
             }
-        });
+        });*/
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             onActivityResult(result.getResultCode(), result.getData());
@@ -88,6 +100,46 @@ public class editar_perfilActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        btn_seleccionar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Crea un Intent para seleccionar un archivo
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                pickImageLauncher.launch(intent);
+            }
+        });
+
+    }
+
+    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Uri imagenSeleccionada = data.getData();
+                        String nombreImg = obtenerNombreArchivo(imagenSeleccionada);
+                        archivo.setText(nombreImg);
+                    }
+                }
+            }
+    );
+
+    private String obtenerNombreArchivo(Uri uri) {
+        String nombre = null;
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nombreIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    nombre = cursor.getString(nombreIndex);
+                }
+            }
+        } else if (uri.getScheme().equals("file")) {
+            nombre = new File(uri.getPath()).getName();
+        }
+        return nombre;
     }
 
     private void obtenerInformacionUsuario() {

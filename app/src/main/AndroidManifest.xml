@@ -6,6 +6,7 @@
         android:name="android.hardware.camera"
         android:required="true" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -28,7 +29,7 @@
             android:exported="false" />
         <activity
             android:name=".mainActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.MyApplication" />
         <activity
