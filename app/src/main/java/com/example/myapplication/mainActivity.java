@@ -40,36 +40,31 @@ public class mainActivity extends AppCompatActivity {
 
         if (usuario != null) {
             usuarioId = usuario.getUid();
-        } else {
-            Intent main_to_log = new Intent(mainActivity.this, loginActivity.class);
-            startActivity(main_to_log);
-            finish();
-            return;
-        }
+            DocumentReference userRef = db.collection("Empleados").document(usuarioId);
+            userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot document) {
+                    if (document.exists()) {
+                        String nombre = document.getString("Nombre");
+                        String apellido = document.getString("Apellido");
+                        String email = document.getString("correo");
+                        String celular = document.getString("telefono");
 
-        DocumentReference userRef = db.collection("usuarios").document(usuarioId);
-        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot document) {
-                if (document.exists()) {
-                    String nombre = document.getString("nombre_cliente");
-                    String apellido = document.getString("apellido_cliente");
-                    String email = document.getString("email_cliente");
-                    String celular = document.getString("telefono_cliente");
-
-                    nombreTextView.setText("Nombre: " + nombre);
-                    apellidoTextView.setText("Apellido: " + apellido);
-                    emailTextView.setText("Email: " + email);
-                    celularTextView.setText("Celular: " + celular);
+                        nombreTextView.setText("Nombre: " + nombre);
+                        apellidoTextView.setText("Apellido: " + apellido);
+                        emailTextView.setText("Email: " + email);
+                        celularTextView.setText("Celular: " + celular);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         btn_editar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent main_to_edit = new Intent(mainActivity.this, editar_perfilActivity.class);
                 startActivity(main_to_edit);
+                finish();
             }
         });
 
@@ -89,6 +84,7 @@ public class mainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent main_to_pass = new Intent(mainActivity.this, contrasenaActivity.class);
                 startActivity(main_to_pass);
+                finish();
             }
         });
     }

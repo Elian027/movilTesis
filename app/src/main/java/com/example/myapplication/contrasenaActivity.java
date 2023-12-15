@@ -21,7 +21,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class contrasenaActivity extends AppCompatActivity {
     EditText contrasenaActual, contrasenaNueva, contrasenaConf;
-    TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
     FirebaseAuth mAuth;
     FirebaseFirestore db;
 
@@ -39,37 +38,9 @@ public class contrasenaActivity extends AppCompatActivity {
         ImageView btn_atras = findViewById(R.id.atras);
         Button btn_cancelar = findViewById(R.id.cancelar);
         Button btn_guardar = findViewById(R.id.guardar);
-        nombreTextView = findViewById(R.id.nombre);
-        apellidoTextView = findViewById(R.id.apellido);
-        emailTextView = findViewById(R.id.email);
-        celularTextView = findViewById(R.id.celular);
         contrasenaActual = findViewById(R.id.pass_actual);
         contrasenaNueva = findViewById(R.id.pass_nueva);
         contrasenaConf = findViewById(R.id.pass_confirmar);
-
-        if (usuarioActual != null) {
-            String usuarioId = usuarioActual.getUid();
-            DocumentReference userRef = db.collection("usuarios").document("wSaPsMKjV1k2FRnAfZFS");
-            userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    if (documentSnapshot.exists()) {
-                        String nombre = documentSnapshot.getString("nombre_cliente");
-                        String apellido = documentSnapshot.getString("apellido_cliente");
-                        String email = documentSnapshot.getString("email_cliente");
-                        String celular = documentSnapshot.getString("telefono_cliente");
-
-                        // Actualiza los TextView con los datos obtenidos
-                        nombreTextView.setText("Nombre: " + nombre);
-                        apellidoTextView.setText("Apellido: " + apellido);
-                        emailTextView.setText("Email: " + email);
-                        celularTextView.setText("Celular: " + celular);
-                    } else {
-                        Log.d("contrasenaActivity", "El documento no existe");
-                    }
-                }
-            });
-        }
 
         btn_atras.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,11 +69,11 @@ public class contrasenaActivity extends AppCompatActivity {
 
                 // Verificar la contraseña actual con Firebase Authentication
                 String usuarioID = mAuth.getCurrentUser().getUid();
-                DocumentReference userDocRef = db.collection("usuarios").document(usuarioID);
+                DocumentReference userDocRef = db.collection("Empleados").document(usuarioID);
 
                 userDocRef.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        String contrasenaBD = task.getResult().getString("pass_cliente");
+                        String contrasenaBD = task.getResult().getString("contrasena");
                         if (contrasenaBD != null && contrasenaBD.equals(passActual)) {
                             // Contraseña actual correcta, verificar las nuevas contraseñas
                             if (passNueva.equals(passConfirmar)) {
@@ -110,7 +81,7 @@ public class contrasenaActivity extends AppCompatActivity {
                                 mAuth.getCurrentUser().updatePassword(passNueva);
 
                                 // Actualizar la contraseña en Cloud Firestore
-                                userDocRef.update("pass_cliente", passNueva);
+                                userDocRef.update("contrasena", passNueva);
 
                                 // Mostrar mensaje de éxito
                                 Toast.makeText(contrasenaActivity.this, "Contraseña cambiada con éxito", Toast.LENGTH_SHORT).show();

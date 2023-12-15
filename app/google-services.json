@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "328536294369",
-    "project_id": "tesisshakinah",
-    "storage_bucket": "tesisshakinah.appspot.com"
+    "project_number": "883709923602",
+    "project_id": "paginawebymovil",
+    "storage_bucket": "paginawebymovil.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:328536294369:android:0e0a3cc5ba528843d588a0",
+        "mobilesdk_app_id": "1:883709923602:android:e3d5638d518cb857d3a3cb",
         "android_client_info": {
           "package_name": "com.example.myapplication"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC8gIZVyuTCpeSn9QP1Vc7sspnsjEiEOEA"
+          "current_key": "AIzaSyDmTZ-rtoSfR8W-wGWs2IRmDiCZueInuyg"
         }
       ],
       "services": {

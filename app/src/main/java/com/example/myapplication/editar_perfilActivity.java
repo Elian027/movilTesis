@@ -74,8 +74,8 @@ public class editar_perfilActivity extends AppCompatActivity {
         btn_cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
-                startActivity(edit_to_main);*/
+                Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
+                startActivity(edit_to_main);
                 finish();
             }
         });
@@ -143,15 +143,15 @@ public class editar_perfilActivity extends AppCompatActivity {
     }
 
     private void obtenerInformacionUsuario() {
-        db.collection("usuarios").document(usuarioID).get()
+        db.collection("Empleados").document(usuarioID).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String nombre = documentSnapshot.getString("nombre_cliente");
-                            String apellido = documentSnapshot.getString("apellido_cliente");
-                            String email = documentSnapshot.getString("email_cliente");
-                            String celular = documentSnapshot.getString("telefono_cliente");
+                            String nombre = documentSnapshot.getString("Nombre");
+                            String apellido = documentSnapshot.getString("Apellido");
+                            String email = documentSnapshot.getString("correo");
+                            String celular = documentSnapshot.getString("telefono");
 
                             // Cargar la información en los EditText
                             nombreET.setText(nombre);
@@ -186,13 +186,13 @@ public class editar_perfilActivity extends AppCompatActivity {
         String nuevoCelular = celularET.getText().toString().trim();
 
         Map<String, Object> datosActualizados = new HashMap<>();
-        datosActualizados.put("nombre_cliente", nuevoNombre);
-        datosActualizados.put("apellido_cliente", nuevoApellido);
-        datosActualizados.put("email_cliente", nuevoEmail);
-        datosActualizados.put("telefono_cliente", nuevoCelular);
+        datosActualizados.put("Nombre", nuevoNombre);
+        datosActualizados.put("Apellido", nuevoApellido);
+        datosActualizados.put("correo", nuevoEmail);
+        datosActualizados.put("telefono", nuevoCelular);
 
         // Actualizar los datos en Firestore
-        db.collection("usuarios").document(usuarioID)
+        db.collection("Empleados").document(usuarioID)
                 .set(datosActualizados, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

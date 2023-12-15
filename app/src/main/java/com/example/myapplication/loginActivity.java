@@ -31,17 +31,17 @@ public class loginActivity extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String emailUser = email.getText().toString().trim();
-                String passUser = password.getText().toString().trim();
+                String emailUsuario = email.getText().toString().trim();
+                String passUsuario = password.getText().toString().trim();
 
-                if (emailUser.isEmpty() && passUser.isEmpty()) {
+                if (emailUsuario.isEmpty() && passUsuario.isEmpty()) {
                     Toast.makeText(loginActivity.this, "Los campos deben estar llenos", Toast.LENGTH_SHORT).show();
                 } else {
-                    loginUser(emailUser, passUser);
+                    loginUsuario(emailUsuario, passUsuario);
                 }
             }
 
-            private void loginUser(String emailUser, String passUser) {
+            private void loginUsuario(String emailUser, String passUser) {
                 mAuth.signInWithEmailAndPassword(emailUser, passUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -56,5 +56,6 @@ public class loginActivity extends AppCompatActivity {
                 });
             }
         });
+
     }
 }
