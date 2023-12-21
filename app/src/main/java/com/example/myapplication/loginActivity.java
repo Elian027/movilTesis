@@ -52,7 +52,7 @@ public class loginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            checkFechaTrabajo();
+                            verificarCampo();
                         } else {
                             Toast.makeText(loginActivity.this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
                         }
@@ -60,7 +60,7 @@ public class loginActivity extends AppCompatActivity {
                 });
             }
 
-            private void checkFechaTrabajo() {
+            private void verificarCampo() {
                 String usuarioID = mAuth.getCurrentUser().getUid();
                 DocumentReference empleadoRef = db.collection("Empleados").document(usuarioID);
 
@@ -68,12 +68,18 @@ public class loginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists() && document.contains("fecha_trabajo")) {
-                                startActivity(new Intent(loginActivity.this, mainActivity.class));
-                                Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                                finish();
+                            DocumentSnapshot documento = task.getResult();
+                            if (documento.exists()) {
+                                if (documento.contains("fecha_trabajo") && documento.getBoolean("fecha_trabajo")) {
+                                    startActivity(new Intent(loginActivity.this, mainActivity.class));
+                                    Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    startActivity(new Intent(loginActivity.this, fechaActivity.class));
+                                    finish();
+                                }
                             } else {
+                                // El documento no existe, es la primera vez que el usuario inicia sesión
                                 startActivity(new Intent(loginActivity.this, fechaActivity.class));
                                 finish();
                             }
@@ -83,6 +89,7 @@ public class loginActivity extends AppCompatActivity {
                     }
                 });
             }
+
         });
     }
 }

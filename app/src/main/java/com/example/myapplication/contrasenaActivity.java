@@ -33,7 +33,6 @@ public class contrasenaActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         // Obtén el usuario actual
-        FirebaseUser usuarioActual = mAuth.getCurrentUser();
 
         ImageView btn_atras = findViewById(R.id.atras);
         Button btn_cancelar = findViewById(R.id.cancelar);
@@ -67,7 +66,6 @@ public class contrasenaActivity extends AppCompatActivity {
                 String passNueva = contrasenaNueva.getText().toString();
                 String passConfirmar = contrasenaConf.getText().toString();
 
-                // Verificar la contraseña actual con Firebase Authentication
                 String usuarioID = mAuth.getCurrentUser().getUid();
                 DocumentReference userDocRef = db.collection("Empleados").document(usuarioID);
 
@@ -75,31 +73,23 @@ public class contrasenaActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String contrasenaBD = task.getResult().getString("contrasena");
                         if (contrasenaBD != null && contrasenaBD.equals(passActual)) {
-                            // Contraseña actual correcta, verificar las nuevas contraseñas
                             if (passNueva.equals(passConfirmar)) {
-                                // Cambiar la contraseña en Firebase Authentication
                                 mAuth.getCurrentUser().updatePassword(passNueva);
 
-                                // Actualizar la contraseña en Cloud Firestore
                                 userDocRef.update("contrasena", passNueva);
 
-                                // Mostrar mensaje de éxito
                                 Toast.makeText(contrasenaActivity.this, "Contraseña cambiada con éxito", Toast.LENGTH_SHORT).show();
 
-                                // Redirigir a la actividad de éxito
                                 Intent pass_to_ex = new Intent(contrasenaActivity.this, exitoContrasenaActivity.class);
                                 startActivity(pass_to_ex);
                                 finish();
                             } else {
-                                // Mostrar mensaje de error si las nuevas contraseñas no coinciden
                                 Toast.makeText(contrasenaActivity.this, "Las nuevas contraseñas no coinciden", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            // Mostrar mensaje de error si la contraseña actual es incorrecta
                             Toast.makeText(contrasenaActivity.this, "La contraseña actual es incorrecta", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // Manejar el caso en el que la verificación de la contraseña en la BD no fue exitosa
                         Toast.makeText(contrasenaActivity.this, "Error al verificar la contraseña", Toast.LENGTH_SHORT).show();
                     }
                 });
