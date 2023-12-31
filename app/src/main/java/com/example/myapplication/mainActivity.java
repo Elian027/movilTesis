@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,12 +13,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 public class mainActivity extends AppCompatActivity {
     Button btn_cerrar, btn_cambiar, btn_editar;
     FirebaseAuth mAuth;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
     String usuarioId;
+    ImageView foto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,8 @@ public class mainActivity extends AppCompatActivity {
         emailTextView = findViewById(R.id.email);
         celularTextView = findViewById(R.id.celular);
 
+        foto = findViewById(R.id.fotoEmpleado);
+
         FirebaseUser usuario = mAuth.getCurrentUser();
 
         if (usuario != null) {
@@ -45,6 +50,11 @@ public class mainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(DocumentSnapshot document) {
                     if (document.exists()) {
+                        String urlImagen = document.getString("urlImagen");
+                        if (urlImagen != null && !urlImagen.isEmpty()) {
+                            Picasso.get().load(urlImagen).into(foto);
+                        }
+
                         String nombre = document.getString("Nombre");
                         String apellido = document.getString("Apellido");
                         String email = document.getString("correo");

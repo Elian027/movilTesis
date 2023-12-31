@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".editar_perfilActivity">
 
-
+    <!-- Barra Superior -->
     <LinearLayout
         android:id="@+id/rectangulo"
         android:layout_width="match_parent"
@@ -34,7 +34,6 @@
             android:layout_gravity="center_vertical" />
     </LinearLayout>
 
-    <!-- CardView para todos los campos del formulario -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewFormulario"
         android:layout_width="match_parent"
@@ -50,85 +49,117 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Campo "Nombre" -->
+            <!-- Fotos -->
+            <LinearLayout
+                android:id="@+id/images_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:cardCornerRadius="70dp">
+
+                    <ImageView
+                        android:id="@+id/fotoEmpleado"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@android:drawable/sym_def_app_icon" />
+                </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/botonFoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cambiar foto" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
             <TextView
+                android:id="@+id/textNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+            <EditText
                 android:id="@+id/nombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nombre" />
+                android:ems="10"
+                android:inputType="textPersonName" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
 
-            <EditText
-                android:id="@+id/editTextNombre"
+            <TextView
+                android:id="@+id/textApellido"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ingrese su nombre"/>
-
-            <!-- Campo "Apellido" -->
-            <TextView
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="Apellido"/>
+            <EditText
                 android:id="@+id/apellido"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Apellido" />
-
-            <EditText
-                android:id="@+id/editTextApellido"
+                android:layout_height="wrap_content"/>
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese su apellido"/>
+                android:layout_height="10dp" />
 
             <TextView
+                android:id="@+id/textEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="Correo" />
+            <EditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Correo" />
-
-            <EditText
-                android:id="@+id/editTextEmail"
+                android:layout_height="wrap_content"/>
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese su email"/>
+                android:layout_height="10dp" />
 
             <TextView
+                android:id="@+id/textCelular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="Celular" />
+            <EditText
                 android:id="@+id/telefono"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Celular" />
+                android:layout_height="wrap_content"/>
 
-            <EditText
-                android:id="@+id/editTextTelefono"
+            <!-- Botón "add" -->
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ingrese su número celular"/>
-
-            <TextView
-                android:id="@+id/foto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Foto" />
-
-            <Button
-                android:id="@+id/seleccionar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Seleccionar archivo"
-                android:layout_gravity="left"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="#808080	" />
-            <TextView
-                android:id="@+id/textViewArchivo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
-                android:text=""
-                app:layout_constraintBaseline_toBaselineOf="@id/seleccionar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/seleccionar" />
-
+                android:layout_height="15dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- CardView para los botones "Cancelar" y "Guardar" -->
+    <!-- Botones "Cancelar" y "Guardar" -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewBotones"
         android:layout_width="match_parent"

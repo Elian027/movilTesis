@@ -28,11 +28,12 @@
 
             <!-- Columna izquierda con una imagen -->
             <ImageView
+                android:id="@+id/fotoEmpleado"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground" />
+                app:srcCompat="@android:drawable/sym_def_app_icon" />
 
             <!-- Columna derecha con información personal -->
             <LinearLayout
