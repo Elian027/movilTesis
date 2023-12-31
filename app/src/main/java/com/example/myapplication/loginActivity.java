@@ -5,13 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,9 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class loginActivity extends AppCompatActivity {
     Button btn_login;
-    EditText email, password;
     FirebaseAuth mAuth;
     FirebaseFirestore db;
+    TextInputLayout email ,password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,24 +41,38 @@ public class loginActivity extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String emailUsuario = email.getText().toString().trim();
-                String passUsuario = password.getText().toString().trim();
+                String emailUsuario = email.getEditText().getText().toString().trim();
+                String passUsuario = password.getEditText().getText().toString().trim();
 
                 if (emailUsuario.isEmpty() && passUsuario.isEmpty()) {
-                    Toast.makeText(loginActivity.this, "Los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+                    mostrarAlerta("Error", "Los campos de correo y contraseña deben estar llenos");
                 } else {
                     loginUsuario(emailUsuario, passUsuario);
                 }
             }
 
+            private void mostrarAlerta(String titulo, String mensaje) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity.this);
+                builder.setTitle(titulo)
+                        .setMessage(mensaje)
+                        .setPositiveButton("OK", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+
             private void loginUsuario(String emailUser, String passUser) {
+                if (passUser.length() < 6) {
+                    mostrarAlerta("Error de inicio de sesión", "La contraseña debe tener al menos 6 caracteres");
+                    return;
+                }
                 mAuth.signInWithEmailAndPassword(emailUser, passUser).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             verificarCampo();
                         } else {
-                            Toast.makeText(loginActivity.this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                            mostrarAlerta("Error de inicio de sesión", "Correo o contraseña incorrectos");
+                            password.getEditText().setText("");
                         }
                     }
                 });
@@ -79,7 +97,6 @@ public class loginActivity extends AppCompatActivity {
                                     finish();
                                 }
                             } else {
-                                // El documento no existe, es la primera vez que el usuario inicia sesión
                                 startActivity(new Intent(loginActivity.this, fechaActivity.class));
                                 finish();
                             }

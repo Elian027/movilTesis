@@ -48,7 +48,6 @@
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toBottomOf="@id/rectangulo"
-      app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
       android:layout_marginTop="8dp"
       android:layout_marginBottom="16dp"
       app:layout_constraintEnd_toEndOf="parent"
@@ -64,88 +63,257 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Día de trabajo:"
+          android:text="Elija su horario de trabajo:"
           android:textSize="18sp"
           android:textColor="@android:color/black"/>
 
-      <CheckBox
-          android:id="@+id/lunes"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Lunes"/>
-      <CheckBox
-          android:id="@+id/martes"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Martes"/>
-      <CheckBox
-          android:id="@+id/miercoles"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Miércoles"/>
-      <CheckBox
-          android:id="@+id/jueves"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Jueves"/>
-      <CheckBox
-          android:id="@+id/viernes"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Viernes"/>
-      <CheckBox
-          android:id="@+id/sabado"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Sábado"/>
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Hora:"
-          android:textSize="18sp"
-          android:textColor="@android:color/black"
-          android:layout_marginTop="16dp"/>
-
-      <EditText
-          android:id="@+id/editTextInicio"
+      <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:hint="Inicio"/>
+          android:orientation="horizontal">
 
-      <EditText
-          android:id="@+id/editTextFin"
+        <CheckBox
+            android:id="@+id/lunes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lunes"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="29dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioLunes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none" />
+        <EditText
+            android:id="@+id/finLunes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none" />
+      </LinearLayout>
+
+      <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:hint="Fin"/>
+          android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/martes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Martes"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioMartes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none" />
+        <EditText
+            android:id="@+id/finMartes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/miercoles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Miércoles"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioMiercoles"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+        <EditText
+            android:id="@+id/finMiercoles"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/jueves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jueves"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioJueves"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+        <EditText
+            android:id="@+id/finJueves"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/viernes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Viernes"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="17dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioViernes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+        <EditText
+            android:id="@+id/finViernes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/sabado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sábado"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="17dp"
+            android:text="Hora:"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"/>
+        <EditText
+            android:id="@+id/inicioSabado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Inicio"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+        <EditText
+            android:id="@+id/finSabado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Fin"
+            android:layout_marginStart="8dp"
+            android:focusable="false"
+            android:inputType="none"/>
+      </LinearLayout>
+
+      <!-- Botones -->
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/cancelar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:text="Cancelar"
+            android:backgroundTint="#E54D71" />
+
+        <Button
+            android:id="@+id/guardar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:text="Guardar"
+            android:backgroundTint="#40AD55" />
+      </LinearLayout>
 
     </LinearLayout>
   </androidx.cardview.widget.CardView>
-
-  <LinearLayout
-      android:id="@+id/buttonsLayout"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      android:gravity="center"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent">
-
-    <Button
-        android:id="@+id/cancelar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancelar"
-        android:backgroundTint="#E54D71"
-        android:layout_marginEnd="16dp"/>
-
-    <Button
-        android:id="@+id/guardar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#40AD55"
-        android:text="Guardar"/>
-  </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
