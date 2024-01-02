@@ -89,9 +89,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
 
             <TextView
                 android:id="@+id/textNombre"
@@ -151,11 +148,19 @@
                 android:id="@+id/telefono"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-
-            <!-- Botón "add" -->
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="15dp" />
+                android:layout_height="10dp" />
+            <Button
+                android:id="@+id/botonHorario"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:text="Ver Horario de trabajo"
+                android:backgroundTint="#FF9800"
+                android:textColor="#FFFFFF"/>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

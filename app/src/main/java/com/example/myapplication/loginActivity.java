@@ -55,7 +55,7 @@ public class loginActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity.this);
                 builder.setTitle(titulo)
                         .setMessage(mensaje)
-                        .setPositiveButton("OK", null);
+                        .setPositiveButton("Aceptar", null);
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
@@ -80,7 +80,7 @@ public class loginActivity extends AppCompatActivity {
 
             private void verificarCampo() {
                 String usuarioID = mAuth.getCurrentUser().getUid();
-                DocumentReference empleadoRef = db.collection("Empleados").document(usuarioID);
+                DocumentReference empleadoRef = db.collection("Personal").document(usuarioID);
 
                 empleadoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -100,8 +100,6 @@ public class loginActivity extends AppCompatActivity {
                                 startActivity(new Intent(loginActivity.this, fechaActivity.class));
                                 finish();
                             }
-                        } else {
-                            Toast.makeText(loginActivity.this, "Error al consultar la base de datos", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

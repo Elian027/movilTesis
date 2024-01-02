@@ -45,20 +45,20 @@ public class mainActivity extends AppCompatActivity {
 
         if (usuario != null) {
             usuarioId = usuario.getUid();
-            DocumentReference userRef = db.collection("Empleados").document(usuarioId);
+            DocumentReference userRef = db.collection("Personal").document(usuarioId);
             userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot document) {
                     if (document.exists()) {
-                        String urlImagen = document.getString("urlImagen");
+                        String urlImagen = document.getString("Foto");
                         if (urlImagen != null && !urlImagen.isEmpty()) {
                             Picasso.get().load(urlImagen).into(foto);
                         }
 
                         String nombre = document.getString("Nombre");
                         String apellido = document.getString("Apellido");
-                        String email = document.getString("correo");
-                        String celular = document.getString("telefono");
+                        String email = document.getString("Email");
+                        String celular = document.getString("Telefono");
 
                         nombreTextView.setText("Nombre: " + nombre);
                         apellidoTextView.setText("Apellido: " + apellido);

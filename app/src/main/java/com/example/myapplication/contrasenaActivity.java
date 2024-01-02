@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -29,10 +30,8 @@ public class contrasenaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contrasena);
 
-        // Inicializa Firebase Authentication y Firestore
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        // Obtén el usuario actual
 
         ImageView btn_atras = findViewById(R.id.atras);
         Button btn_cancelar = findViewById(R.id.cancelar);
@@ -67,16 +66,16 @@ public class contrasenaActivity extends AppCompatActivity {
                 String passConfirmar = contrasenaConf.getText().toString();
 
                 String usuarioID = mAuth.getCurrentUser().getUid();
-                DocumentReference userDocRef = db.collection("Empleados").document(usuarioID);
+                DocumentReference userDocRef = db.collection("Personal").document(usuarioID);
 
                 userDocRef.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        String contrasenaBD = task.getResult().getString("contrasena");
+                        String contrasenaBD = task.getResult().getString("contrasenia");
                         if (contrasenaBD != null && contrasenaBD.equals(passActual)) {
                             if (passNueva.equals(passConfirmar)) {
                                 mAuth.getCurrentUser().updatePassword(passNueva);
 
-                                userDocRef.update("contrasena", passNueva);
+                                userDocRef.update("contrasenia", passNueva);
 
                                 Toast.makeText(contrasenaActivity.this, "Contraseña cambiada con éxito", Toast.LENGTH_SHORT).show();
 
@@ -89,13 +88,19 @@ public class contrasenaActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(contrasenaActivity.this, "La contraseña actual es incorrecta", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(contrasenaActivity.this, "Error al verificar la contraseña", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
-
-
     }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(contrasenaActivity.this);
+        builder.setTitle(titulo)
+                .setMessage(mensaje)
+                .setPositiveButton("Aceptar", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }
