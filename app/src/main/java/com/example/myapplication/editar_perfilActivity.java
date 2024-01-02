@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -106,18 +107,23 @@ public class editar_perfilActivity extends AppCompatActivity {
         btn_verHorario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mostrarHorarioController.mostrarDialogoHorario(editar_perfilActivity.this);
+                mostrarHorarioController.mostrarDialogoHorario(editar_perfilActivity.this, usuarioID);
             }
         });
     }
 
     public static class mostrarHorarioController {
-        public static void mostrarDialogoHorario(Context context) {
+        public static void mostrarDialogoHorario(Context context, String usuarioID) {
             View view = LayoutInflater.from(context).inflate(R.layout.activity_fecha_ver, null);
 
             // Propiedades de la vista
             Button btn_editar = view.findViewById(R.id.botonEditarHorario);
-
+            CheckBox caja_lunes = view.findViewById(R.id.lunes);
+            CheckBox caja_martes = view.findViewById(R.id.martes);
+            CheckBox caja_miercoles = view.findViewById(R.id.miercoles);
+            CheckBox caja_jueves = view.findViewById(R.id.jueves);
+            CheckBox caja_viernes = view.findViewById(R.id.viernes);
+            CheckBox caja_sabado = view.findViewById(R.id.sabado);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
@@ -127,31 +133,108 @@ public class editar_perfilActivity extends AppCompatActivity {
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+            DocumentReference drPersonal = FirebaseFirestore.getInstance().collection("Personal").document(usuarioID);
+            drPersonal.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    // Verifica el estado de cada día y actualiza los CheckBox correspondientes
+                    cargarCheckBox(caja_lunes, documentSnapshot.getBoolean("lunes"));
+                    cargarCheckBox(caja_martes, documentSnapshot.getBoolean("martes"));
+                    cargarCheckBox(caja_miercoles, documentSnapshot.getBoolean("miercoles"));
+                    cargarCheckBox(caja_jueves, documentSnapshot.getBoolean("jueves"));
+                    cargarCheckBox(caja_viernes, documentSnapshot.getBoolean("viernes"));
+                    cargarCheckBox(caja_sabado, documentSnapshot.getBoolean("sabado"));
+                }
+            });
 
             btn_editar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    editarHorarioController.editarDialogoHorario(context);
+                    alertDialog.dismiss();
+                    editarHorarioController.editarDialogoHorario(context, usuarioID);
                 }
             });
         }
     }
 
+    private static void cargarCheckBox(CheckBox checkBox, Boolean estado) {
+        if (estado != null && estado) {
+            checkBox.setChecked(true);
+        } else {
+            checkBox.setChecked(false);
+        }
+    }
+
     public static class editarHorarioController {
-        public static void editarDialogoHorario(Context context) {
+        public static void editarDialogoHorario(Context context, String usuarioID) {
             View view = LayoutInflater.from(context).inflate(R.layout.activity_fecha_editar, null);
 
             //Propiedades de la vista
+            CheckBox caja_lunes = view.findViewById(R.id.lunes);
+            CheckBox caja_martes = view.findViewById(R.id.martes);
+            CheckBox caja_miercoles = view.findViewById(R.id.miercoles);
+            CheckBox caja_jueves = view.findViewById(R.id.jueves);
+            CheckBox caja_viernes = view.findViewById(R.id.viernes);
+            CheckBox caja_sabado = view.findViewById(R.id.sabado);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
             builder.setTitle("Editar días de trabajo");
-            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+            builder.setPositiveButton("Guardar", (dialog, which) -> {
+                boolean lunes = caja_lunes.isChecked();
+                boolean martes = caja_martes.isChecked();
+                boolean miercoles = caja_miercoles.isChecked();
+                boolean jueves = caja_jueves.isChecked();
+                boolean viernes = caja_viernes.isChecked();
+                boolean sabado = caja_sabado.isChecked();
+
+                // Actualiza en Firestore con los nuevos valores
+                actualizar(usuarioID, lunes, martes, miercoles, jueves, viernes, sabado);
+
                 dialog.dismiss();
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+
+            DocumentReference drPersonal = FirebaseFirestore.getInstance().collection("Personal").document(usuarioID);
+
+            drPersonal.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    // Verifica el estado de cada día y actualiza los CheckBox correspondientes
+                    cargarCheckBox(caja_lunes, documentSnapshot.getBoolean("lunes"));
+                    cargarCheckBox(caja_martes, documentSnapshot.getBoolean("martes"));
+                    cargarCheckBox(caja_miercoles, documentSnapshot.getBoolean("miercoles"));
+                    cargarCheckBox(caja_jueves, documentSnapshot.getBoolean("jueves"));
+                    cargarCheckBox(caja_viernes, documentSnapshot.getBoolean("viernes"));
+                    cargarCheckBox(caja_sabado, documentSnapshot.getBoolean("sabado"));
+                }
+            });
+
         }
+    }
+
+    private static void actualizar(String usuarioID, boolean lunes, boolean martes, boolean miercoles,
+                                              boolean jueves, boolean viernes, boolean sabado) {
+        Map<String, Object> diasTrabajo = new HashMap<>();
+        diasTrabajo.put("lunes", lunes);
+        diasTrabajo.put("martes", martes);
+        diasTrabajo.put("miercoles", miercoles);
+        diasTrabajo.put("jueves", jueves);
+        diasTrabajo.put("viernes", viernes);
+        diasTrabajo.put("sabado", sabado);
+
+        FirebaseFirestore.getInstance().collection("Personal").document(usuarioID)
+                .set(diasTrabajo, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                    }
+                })
+                .addOnFailureListener(e -> {
+
+                });
     }
 
     private void abrirGaleria() {
@@ -187,10 +270,9 @@ public class editar_perfilActivity extends AppCompatActivity {
                 imagenRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        // Puedes utilizar la URL de la imagen como sea necesario
                         urlImagen = uri.toString();
 
-                        // Muestra la imagen en tu ImageView usando Picasso
+                        // Mostrar imagen en el ImageView
                         Picasso.get().load(urlImagen).into(foto);
 
                         // Guarda la URL en Firestore
