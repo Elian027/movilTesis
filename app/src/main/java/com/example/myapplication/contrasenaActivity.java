@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,7 +22,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class contrasenaActivity extends AppCompatActivity {
-    EditText contrasenaActual, contrasenaNueva, contrasenaConf;
+    TextInputEditText contrasenaActual, contrasenaNueva, contrasenaConf;
     FirebaseAuth mAuth;
     FirebaseFirestore db;
 
@@ -65,36 +66,40 @@ public class contrasenaActivity extends AppCompatActivity {
                 String passNueva = contrasenaNueva.getText().toString();
                 String passConfirmar = contrasenaConf.getText().toString();
 
-                String usuarioID = mAuth.getCurrentUser().getUid();
-                DocumentReference userDocRef = db.collection("Personal").document(usuarioID);
+                if (passNueva.equals(passConfirmar)) {
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                userDocRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String contrasenaBD = task.getResult().getString("contrasenia");
-                        if (contrasenaBD != null && contrasenaBD.equals(passActual)) {
-                            if (passNueva.equals(passConfirmar)) {
-                                mAuth.getCurrentUser().updatePassword(passNueva);
-
-                                userDocRef.update("contrasenia", passNueva);
-
-                                Toast.makeText(contrasenaActivity.this, "Contraseña cambiada con éxito", Toast.LENGTH_SHORT).show();
-
-                                Intent pass_to_ex = new Intent(contrasenaActivity.this, exitoContrasenaActivity.class);
-                                startActivity(pass_to_ex);
-                                finish();
-                            } else {
-                                Toast.makeText(contrasenaActivity.this, "Las nuevas contraseñas no coinciden", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(contrasenaActivity.this, "La contraseña actual es incorrecta", Toast.LENGTH_SHORT).show();
-                        }
+                    if (currentUser != null) {
+                        // Verificar la contraseña actual directamente en la autenticación
+                        mAuth.signInWithEmailAndPassword(currentUser.getEmail(), passActual)
+                                .addOnCompleteListener(authTask -> {
+                                    if (authTask.isSuccessful()) {
+                                        // La contraseña actual es correcta, actualizar la contraseña
+                                        currentUser.updatePassword(passNueva)
+                                                .addOnCompleteListener(updateTask -> {
+                                                    if (updateTask.isSuccessful()) {
+                                                        Intent irMain = new Intent(contrasenaActivity.this, exitoContrasenaActivity.class);
+                                                        startActivity(irMain);
+                                                        finish();
+                                                    } else {
+                                                        mostrarError("Error", "No se pudo actualizar la contraseña de autenticación");
+                                                    }
+                                                });
+                                    } else {
+                                        mostrarError("Error", "La contraseña actual es incorrecta");
+                                    }
+                                });
+                    } else {
+                        mostrarError("Error", "Usuario no autenticado");
                     }
-                });
+                } else {
+                    mostrarError("Error", "Las nuevas contraseñas no coinciden");
+                }
             }
         });
-    }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
+    }
+    private void mostrarError(String titulo, String mensaje) {
         AlertDialog.Builder builder = new AlertDialog.Builder(contrasenaActivity.this);
         builder.setTitle(titulo)
                 .setMessage(mensaje)

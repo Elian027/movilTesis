@@ -63,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp" />
 
-                <!-- Email -->
                 <TextView
                     android:id="@+id/email"
                     android:layout_width="match_parent"
@@ -71,7 +70,6 @@
                     android:layout_marginTop="8dp"
                     android:text="" />
 
-                <!-- Celular -->
                 <TextView
                     android:id="@+id/celular"
                     android:layout_width="match_parent"
@@ -143,57 +141,49 @@
         app:cardElevation="4dp">
 
         <TableLayout
+            android:id="@+id/tablaCitas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="*">
 
+            <!-- Fila de encabezado -->
             <TableRow>
-
-                <!-- Celda 1 -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:text="Servicio" />
 
-                <!-- Celda 2 -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:text="Fecha" />
 
-                <!-- Celda 3 -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:text="Hora" />
 
-                <!-- Celda 4 -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Cliente" />
-
-                <!-- Celda 5 -->
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:gravity="center"
                     android:text="Costo" />
 
-                <!-- Celda 6 -->
-<!--                <Button
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Modificar"
-                    android:layout_gravity="center"/>-->
-            </TableRow>
+                    android:gravity="center"
+                    android:text="" />
 
-            <!-- Puedes agregar más filas según sea necesario -->
+            </TableRow>
 
         </TableLayout>
 
