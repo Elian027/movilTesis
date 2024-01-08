@@ -15,6 +15,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.app.AlertDialog;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -32,6 +33,7 @@ public class mainActivity extends AppCompatActivity {
     String usuarioId;
     ImageView foto;
     TableLayout tabla;
+    String correoUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +122,6 @@ public class mainActivity extends AppCompatActivity {
     private void cargarCitas() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Consulta para obtener citas del empleado
         db.collection("Citas")
                 .whereEqualTo("IDEmpleado", usuarioId)
                 .get()
@@ -199,12 +200,14 @@ public class mainActivity extends AppCompatActivity {
 
             View view = LayoutInflater.from(context).inflate(R.layout.activity_cita_ver, null);
             // Propiedades de la vista
+            Button btn_cancelar = view.findViewById(R.id.botonCancelar);
             EditText etServicio = view.findViewById(R.id.servicio);
             EditText etFecha = view.findViewById(R.id.fecha);
             EditText etHora = view.findViewById(R.id.hora);
             EditText etCliente = view.findViewById(R.id.cliente);
             EditText etCosto = view.findViewById(R.id.costo);
             EditText etEstado = view.findViewById(R.id.estado);
+            final String[] correo = {""};
 
             etServicio.setText(servicio);
             etFecha.setText(fecha);
@@ -217,6 +220,7 @@ public class mainActivity extends AppCompatActivity {
                     if (document.exists()) {
                         String nombreUsuario = document.getString("Nombre");
                         String apellidoUsuario = document.getString("Apellido");
+                        correo[0] = document.getString("Correo");
 
                         etCliente.setText(nombreUsuario + " " + apellidoUsuario);
                     }
@@ -229,6 +233,39 @@ public class mainActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
             builder.setTitle("Ver información de cita");
+            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+                dialog.dismiss();
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            btn_cancelar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    editarCitaController.mostrarEditarCita(context, correo[0]);
+                    alertDialog.dismiss();
+                }
+            });
+        }
+    }
+
+    public static class editarCitaController {
+        public static void mostrarEditarCita(Context context, String correo) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            View view = LayoutInflater.from(context).inflate(R.layout.activity_cita_cancelar, null);
+
+            //Propiedades de la vista
+            Button btn_enviar = view.findViewById(R.id.btnEnviarCorreo);
+            TextInputEditText correoC = view.findViewById(R.id.correoCan);
+            TextInputEditText asuntoC = view.findViewById(R.id.asuntoCan);
+            TextInputEditText mensajeC = view.findViewById(R.id.mensajeCan);
+
+            correoC.setText(correo);
+            /*asuntoC.setText("Cancelación de cita");*/
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(view);
+            builder.setTitle("Cancelación de cita");
             builder.setPositiveButton("Aceptar", (dialog, which) -> {
                 dialog.dismiss();
             });

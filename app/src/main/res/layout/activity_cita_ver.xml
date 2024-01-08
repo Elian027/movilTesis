@@ -138,13 +138,6 @@
                 android:backgroundTint="#E54D71"
                 android:text="Cancelar cita" />
 
-            <Button
-                android:id="@+id/botonGuardar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="#FF9800"
-                android:text="Modificar cita" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
