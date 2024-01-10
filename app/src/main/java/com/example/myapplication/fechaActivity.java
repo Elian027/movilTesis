@@ -4,17 +4,22 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class fechaActivity extends AppCompatActivity {
-    Button btn_guardar, btn_cancelar;
+    Button btn_guardar, btn_cancelar, btn_atras;
     CheckBox caja_lunes, caja_martes, caja_miercoles, caja_jueves, caja_viernes, caja_sabado;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -25,6 +30,7 @@ public class fechaActivity extends AppCompatActivity {
 
         btn_guardar = findViewById(R.id.guardar);
         btn_cancelar = findViewById(R.id.cancelar);
+        btn_atras = findViewById(R.id.atras);
 
         caja_lunes = findViewById(R.id.lunes);
         caja_martes = findViewById(R.id.martes);
@@ -38,7 +44,6 @@ public class fechaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent fecha_to_log = new Intent(fechaActivity.this, loginActivity.class);
                 startActivity(fecha_to_log);
-                finish();
             }
         });
 
@@ -46,6 +51,15 @@ public class fechaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 guardarDias();
+            }
+        });
+        cargarDias();
+
+        btn_atras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent fecha_to_log = new Intent(fechaActivity.this, loginActivity.class);
+                startActivity(fecha_to_log);
             }
         });
     }
@@ -73,57 +87,139 @@ public class fechaActivity extends AppCompatActivity {
         mostrarAlerta("Éxito", "Los días seleccionados se han guardado correctamente", () -> {
             Intent irMain = new Intent(fechaActivity.this, mainActivity.class);
             startActivity(irMain);
-            finish();
         });
     }
 
-    private boolean guardarDias() {
+    private void cargarDias() {
+        // Obtener los días desde la base de datos y marcar las CheckBox correspondientes
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario != null) {
             String usuarioID = usuario.getUid();
 
-            final Map<String, Object> empleadoData = obtenerDiasSeleccionados();
+            DocumentReference drPersonal = db.collection("Personal").document(usuarioID);
+            drPersonal.get().addOnSuccessListener(documentSnapshot -> {
+                // Obtener el array de días laborables desde el documento
+                List<Integer> diasLaborables = documentSnapshot.get("dias_laborables", List.class);
+
+                // Verificar si la lista de días laborables no es nula
+                if (diasLaborables != null) {
+                    // Iterar sobre los días laborables y marcar los CheckBox correspondientes
+                    for (Integer diaLaborable : diasLaborables) {
+                        marcarCheckBoxSegunDia(diaLaborable);
+                    }
+                }
+            });
+        }
+    }
+
+    private void marcarCheckBoxSegunDia(int diaLaborable) {
+        switch (diaLaborable) {
+            case 1:
+                caja_lunes.setChecked(true);
+                break;
+            case 2:
+                caja_martes.setChecked(true);
+                break;
+            case 3:
+                caja_miercoles.setChecked(true);
+                break;
+            case 4:
+                caja_jueves.setChecked(true);
+                break;
+            case 5:
+                caja_viernes.setChecked(true);
+                break;
+            case 6:
+                caja_sabado.setChecked(true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void guardarDias() {
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario != null) {
+            String usuarioID = usuario.getUid();
+
+            Map<String, Object> empleadoData = obtenerDiasSeleccionados();
 
             if (!verificarDias(empleadoData)) {
                 mostrarAlertaX("Error", "Debes seleccionar al menos un día");
-                return false;
+                return;
             }
-            empleadoData.put("fecha_trabajo", true);
-            db.collection("Personal")
-                    .document(usuarioID)
-                    .update(empleadoData)
-                    .addOnSuccessListener(aVoid -> {
-                        mostrarAlertaExito();
-                    });
+            Log.d("GuardarDias", "Días laborables antes de actualizar: " + empleadoData.get("dias_laborables"));
+
+            // Actualizar la base de datos con los nuevos valores
+            actualizar(usuarioID, empleadoData);
         }
-        return true;
     }
 
     private Map<String, Object> obtenerDiasSeleccionados() {
         Map<String, Object> diasSeleccionados = new HashMap<>();
-        agregarDiaSeleccionado(diasSeleccionados, "lunes", caja_lunes);
-        agregarDiaSeleccionado(diasSeleccionados, "martes", caja_martes);
-        agregarDiaSeleccionado(diasSeleccionados, "miercoles", caja_miercoles);
-        agregarDiaSeleccionado(diasSeleccionados, "jueves", caja_jueves);
-        agregarDiaSeleccionado(diasSeleccionados, "viernes", caja_viernes);
-        agregarDiaSeleccionado(diasSeleccionados, "sabado", caja_sabado);
+
+        List<Integer> diasLaborables = new ArrayList<>();
+        List<Integer> diasNoLaborables = new ArrayList<>();
+
+        if (caja_lunes.isChecked()) {
+            diasLaborables.add(1);
+        } else {
+            diasNoLaborables.add(1);
+        }
+
+        if (caja_martes.isChecked()) {
+            diasLaborables.add(2);
+        } else {
+            diasNoLaborables.add(2);
+        }
+
+        if (caja_miercoles.isChecked()) {
+            diasLaborables.add(3);
+        } else {
+            diasNoLaborables.add(3);
+        }
+
+        if (caja_jueves.isChecked()) {
+            diasLaborables.add(4);
+        } else {
+            diasNoLaborables.add(4);
+        }
+        if (caja_viernes.isChecked()) {
+            diasLaborables.add(5);
+        } else {
+            diasNoLaborables.add(5);
+        }
+
+        if (caja_sabado.isChecked()) {
+            diasLaborables.add(6);
+        } else {
+            diasNoLaborables.add(6);
+        }
+
+        diasNoLaborables.add(0);
+
+        diasSeleccionados.put("dias_laborables", diasLaborables);
+        diasSeleccionados.put("dias_no_laborables", diasNoLaborables);
+
+        diasSeleccionados.put("fecha_trabajo", true);
+
+        Log.d("ObtenerDias", "Días laborables antes de devolver el mapa: " + diasLaborables);
+
         return diasSeleccionados;
     }
 
-    private void agregarDiaSeleccionado(Map<String, Object> map, String key, CheckBox checkBox) {
-        if (checkBox.isChecked()) {
-            map.put(key, true);
-        }
+    private void actualizar(String usuarioID, Map<String, Object> empleadoData) {
+        DocumentReference drPersonal = db.collection("Personal").document(usuarioID);
+
+        drPersonal.update(empleadoData)
+                .addOnSuccessListener(aVoid -> mostrarAlertaExito())
+                .addOnFailureListener(e -> mostrarAlertaX("Error", "Error al actualizar los datos: " + e.getMessage()));
     }
 
     private boolean verificarDias(Map<String, Object> empleadoData) {
-        // Verificar al menos un día seleccionado
-        for (String key : empleadoData.keySet()) {
-            if (key.equals("lunes") || key.equals("martes") || key.equals("miercoles") ||
-                    key.equals("jueves") || key.equals("viernes") || key.equals("sabado")) {
-                return true;
-            }
-        }
-        return false;
+        List<Integer> diasLaborables = (List<Integer>) empleadoData.get("dias_laborables");
+        Log.d("VerificarDias", "Días laborables antes de la verificación: " + diasLaborables);
+
+        return (diasLaborables != null && !diasLaborables.isEmpty());
     }
 }

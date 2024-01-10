@@ -3,13 +3,12 @@ package com.example.myapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
@@ -17,9 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -55,8 +54,6 @@ public class loginActivity extends AppCompatActivity {
                     loginUsuario(emailUsuario, passUsuario);
                 }
             }
-
-
         });
 
         btn_recuperarPass.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +61,6 @@ public class loginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent irReccuperar = new Intent(loginActivity.this, restaurarContrasenaActivity.class);
                 startActivity(irReccuperar);
-                finish();
             }
         });
     }
@@ -78,17 +74,17 @@ public class loginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documento = task.getResult();
                     if (documento.exists()) {
-                        if (documento.contains("fecha_trabajo") && documento.getBoolean("fecha_trabajo")) {
+                        if (documento.contains("Password")) {
+                            // El campo "Password" existe, dirigir a contrasenaNuevaActivity
+                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+                            startActivity(irContrasena);
+                            finish();
+                        } else {
+                            // El campo "Password" no existe, dirigir a mainActivity
                             startActivity(new Intent(loginActivity.this, mainActivity.class));
                             Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
                             finish();
-                        } else {
-                            startActivity(new Intent(loginActivity.this, fechaActivity.class));
-                            finish();
                         }
-                    } else {
-                        startActivity(new Intent(loginActivity.this, fechaActivity.class));
-                        finish();
                     }
                 }
             }
@@ -115,6 +111,8 @@ public class loginActivity extends AppCompatActivity {
                                             @Override
                                             public void onComplete(@NonNull Task<AuthResult> authTask) {
                                                 if (authTask.isSuccessful()) {
+                                                    FirebaseUser usuarioX = mAuth.getCurrentUser();
+                                                    saveUserCredentials(usuarioX.getEmail(), usuarioX.getUid());
                                                     verificarCampo();
                                                 } else {
                                                     mostrarAlerta("Error de inicio de sesión", "Correo o contraseña incorrectos");
@@ -132,6 +130,17 @@ public class loginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void saveUserCredentials(String userEmail, String userId) {
+        // Almacenar las credenciales en SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString("email", userEmail);
+        editor.putString("userId", userId);
+
+        editor.apply();
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {

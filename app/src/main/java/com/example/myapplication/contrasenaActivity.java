@@ -46,7 +46,6 @@ public class contrasenaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent pass_to_main = new Intent(contrasenaActivity.this, mainActivity.class);
                 startActivity(pass_to_main);
-                finish();
             }
         });
 
@@ -55,7 +54,6 @@ public class contrasenaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent pass_to_main = new Intent(contrasenaActivity.this, mainActivity.class);
                 startActivity(pass_to_main);
-                finish();
             }
         });
 

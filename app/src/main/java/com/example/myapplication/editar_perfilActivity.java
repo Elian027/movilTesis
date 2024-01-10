@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.Context;
+import java.util.List;
+import java.util.ArrayList;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -26,6 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,7 +73,6 @@ public class editar_perfilActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
                 startActivity(edit_to_main);
-                finish();
             }
         });
 
@@ -78,7 +81,6 @@ public class editar_perfilActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
                 startActivity(edit_to_main);
-                finish();
             }
         });
 
@@ -88,7 +90,6 @@ public class editar_perfilActivity extends AppCompatActivity {
                 guardarCambios();
                 Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
                 startActivity(edit_to_main);
-                finish();
             }
         });
 
@@ -132,13 +133,16 @@ public class editar_perfilActivity extends AppCompatActivity {
             drPersonal.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    List<Object> diasLaborablesObject = (List<Object>) documentSnapshot.get("dias_laborables");
+                    Log.d("MostrarHorarioController", "Días laborables: " + diasLaborablesObject);
+
                     // Verifica el estado de cada día y actualiza los CheckBox correspondientes
-                    cargarCheckBox(caja_lunes, documentSnapshot.getBoolean("lunes"));
-                    cargarCheckBox(caja_martes, documentSnapshot.getBoolean("martes"));
-                    cargarCheckBox(caja_miercoles, documentSnapshot.getBoolean("miercoles"));
-                    cargarCheckBox(caja_jueves, documentSnapshot.getBoolean("jueves"));
-                    cargarCheckBox(caja_viernes, documentSnapshot.getBoolean("viernes"));
-                    cargarCheckBox(caja_sabado, documentSnapshot.getBoolean("sabado"));
+                    cargarCheckBox(caja_lunes, diasLaborablesObject, 1);
+                    cargarCheckBox(caja_martes, diasLaborablesObject, 2);
+                    cargarCheckBox(caja_miercoles, diasLaborablesObject, 3);
+                    cargarCheckBox(caja_jueves, diasLaborablesObject, 4);
+                    cargarCheckBox(caja_viernes, diasLaborablesObject, 5);
+                    cargarCheckBox(caja_sabado, diasLaborablesObject, 6);
                 }
             });
 
@@ -152,11 +156,22 @@ public class editar_perfilActivity extends AppCompatActivity {
         }
     }
 
-    private static void cargarCheckBox(CheckBox checkBox, Boolean estado) {
-        if (estado != null && estado) {
-            checkBox.setChecked(true);
+    private static void cargarCheckBox(CheckBox checkBox, List<Object> diasLaborables, int dia) {
+        if (diasLaborables != null) {
+            Log.d("CheckBoxLog", "Días laborables: " + diasLaborables);
+            Log.d("CheckBoxLog", "Día a verificar: " + dia);
+
+            if (diasLaborables.contains((long) dia)) {
+                // Día laborable, marcar CheckBox
+                Log.d("CheckBoxLog", "Día " + dia + " marcado como laborable");
+                checkBox.setChecked(true);
+            } else {
+                // Día no laborable, desmarcar CheckBox
+                Log.d("CheckBoxLog", "Día " + dia + " marcado como no laborable");
+                checkBox.setChecked(false);
+            }
         } else {
-            checkBox.setChecked(false);
+            Log.d("CheckBoxLog", "La lista de días laborables es nula");
         }
     }
 
@@ -165,28 +180,49 @@ public class editar_perfilActivity extends AppCompatActivity {
             View view = LayoutInflater.from(context).inflate(R.layout.activity_fecha_editar, null);
 
             //Propiedades de la vista
-            CheckBox caja_lunes = view.findViewById(R.id.lunes);
-            CheckBox caja_martes = view.findViewById(R.id.martes);
-            CheckBox caja_miercoles = view.findViewById(R.id.miercoles);
-            CheckBox caja_jueves = view.findViewById(R.id.jueves);
-            CheckBox caja_viernes = view.findViewById(R.id.viernes);
-            CheckBox caja_sabado = view.findViewById(R.id.sabado);
+            CheckBox[] cajas = new CheckBox[]{
+                    view.findViewById(R.id.lunes),
+                    view.findViewById(R.id.martes),
+                    view.findViewById(R.id.miercoles),
+                    view.findViewById(R.id.jueves),
+                    view.findViewById(R.id.viernes),
+                    view.findViewById(R.id.sabado)
+            };
+
+            List<Object> diasLaborables = new ArrayList<>();
+            List<Object> diasNoLaborables = new ArrayList<>();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
             builder.setTitle("Editar días de trabajo");
             builder.setPositiveButton("Guardar", (dialog, which) -> {
-                boolean lunes = caja_lunes.isChecked();
-                boolean martes = caja_martes.isChecked();
-                boolean miercoles = caja_miercoles.isChecked();
-                boolean jueves = caja_jueves.isChecked();
-                boolean viernes = caja_viernes.isChecked();
-                boolean sabado = caja_sabado.isChecked();
 
-                // Actualiza en Firestore con los nuevos valores
-                actualizar(usuarioID, lunes, martes, miercoles, jueves, viernes, sabado);
+                for (int i = 0; i < cajas.length; i++) {
+                    CheckBox checkBox = cajas[i];
+                    if (checkBox.isChecked()) {
+                        diasLaborables.add(i + 1);  // Agregar día laborable
+                    } else {
+                        diasNoLaborables.add(i + 1);  // Agregar día no laborable
+                    }
+                }
 
-                dialog.dismiss();
+                if (!diasLaborables.isEmpty()) {
+                    if (!diasNoLaborables.contains(0)) {
+                        diasNoLaborables.add(0);
+                    }
+
+                    Object[] arrayDiasLaborables = diasLaborables.toArray(new Object[0]);
+                    Object[] arrayDiasNoLaborables = diasNoLaborables.toArray(new Object[0]);
+
+                    // Validar que "dias_laborables" no esté vacío
+                    if (arrayDiasLaborables.length > 0) {
+                        // Actualizar en Firestore solo si hay días laborables seleccionados
+                        actualizar(usuarioID, arrayDiasLaborables, arrayDiasNoLaborables);
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(context, "Debes seleccionar al menos un día laborable", Toast.LENGTH_SHORT).show();
+                    }
+                }
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
@@ -196,41 +232,37 @@ public class editar_perfilActivity extends AppCompatActivity {
             drPersonal.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    // Obtener las listas de días laborables y no laborables
+                    List<Object> diasLaborables = (List<Object>) documentSnapshot.get("dias_laborables");
+
                     // Verifica el estado de cada día y actualiza los CheckBox correspondientes
-                    cargarCheckBox(caja_lunes, documentSnapshot.getBoolean("lunes"));
-                    cargarCheckBox(caja_martes, documentSnapshot.getBoolean("martes"));
-                    cargarCheckBox(caja_miercoles, documentSnapshot.getBoolean("miercoles"));
-                    cargarCheckBox(caja_jueves, documentSnapshot.getBoolean("jueves"));
-                    cargarCheckBox(caja_viernes, documentSnapshot.getBoolean("viernes"));
-                    cargarCheckBox(caja_sabado, documentSnapshot.getBoolean("sabado"));
+                    for (int i = 0; i < cajas.length; i++) {
+                        CheckBox checkBox = cajas[i];
+                        checkBox.setChecked(diasLaborables != null && diasLaborables.contains((long) (i + 1)));
+                    }
                 }
             });
-
         }
     }
 
-    private static void actualizar(String usuarioID, boolean lunes, boolean martes, boolean miercoles,
-                                              boolean jueves, boolean viernes, boolean sabado) {
-        Map<String, Object> diasTrabajo = new HashMap<>();
-        diasTrabajo.put("lunes", lunes);
-        diasTrabajo.put("martes", martes);
-        diasTrabajo.put("miercoles", miercoles);
-        diasTrabajo.put("jueves", jueves);
-        diasTrabajo.put("viernes", viernes);
-        diasTrabajo.put("sabado", sabado);
+    private static void actualizar(String usuarioID, Object[] diasLaborables, Object[] diasNoLaborables) {
+        Map<String, Object> datosActualizados = new HashMap<>();
+        datosActualizados.put("dias_laborables", Arrays.asList(diasLaborables));
+        datosActualizados.put("dias_no_laborables", Arrays.asList(diasNoLaborables));
 
         FirebaseFirestore.getInstance().collection("Personal").document(usuarioID)
-                .set(diasTrabajo, SetOptions.merge())
+                .set(datosActualizados, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-
+                        // Manejar el éxito si es necesario
                     }
                 })
                 .addOnFailureListener(e -> {
-
+                    // Manejar el fallo si es necesario
                 });
     }
+
 
     private void abrirGaleria() {
         Intent i = new Intent(Intent.ACTION_PICK);

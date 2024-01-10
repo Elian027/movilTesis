@@ -33,7 +33,6 @@ public class mainActivity extends AppCompatActivity {
     String usuarioId;
     ImageView foto;
     TableLayout tabla;
-    String correoUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +61,6 @@ public class mainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent main_to_edit = new Intent(mainActivity.this, editar_perfilActivity.class);
                 startActivity(main_to_edit);
-                finish();
             }
         });
 
@@ -73,7 +71,6 @@ public class mainActivity extends AppCompatActivity {
 
                 Intent main_to_log = new Intent(mainActivity.this, loginActivity.class);
                 startActivity(main_to_log);
-                finish();
             }
         });
 
@@ -82,7 +79,6 @@ public class mainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent main_to_pass = new Intent(mainActivity.this, contrasenaActivity.class);
                 startActivity(main_to_pass);
-                finish();
             }
         });
     }
@@ -129,31 +125,23 @@ public class mainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            // Obtener valores de la cita
-                            String servicio = document.getString("Titulo");
-                            String fecha = document.getString("Fecha");
-                            String hora = document.getString("Hora");
-                            String idUsuario = document.getString("IDUsuario");
-                            String costo = document.getString("Precio");
-                            String estado = document.getString("Estado");
-
-                            // Agregar una fila por cada cita
-                            agregarFila(servicio, fecha, hora, idUsuario, costo, estado);
+                            // Llama a agregarFila y pasa el documento
+                            agregarFila(document);
                         }
                     }
                 });
     }
 
-    private void agregarFila(String... valores) {
+    private void agregarFila(QueryDocumentSnapshot document) {
         TableRow fila = new TableRow(this);
 
         // Extrayendo valores
-        String servicio = valores[0];
-        String fecha = valores[1];
-        String hora = valores[2];
-        String idUsuario = valores[3];
-        String costo = valores[4];
-        String estado = valores[5];
+        String servicio = document.getString("Titulo");
+        String fecha = document.getString("Fecha");
+        String hora = document.getString("Hora");
+        String idUsuario = document.getString("IDUsuario");
+        String costo = document.getString("Precio");
+        String estado = document.getString("Estado");
 
         TextView servicioTextView = new TextView(this);
         servicioTextView.setText(servicio);
@@ -186,12 +174,36 @@ public class mainActivity extends AppCompatActivity {
         verButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verCitaController.mostrarDialogoCita(mainActivity.this, servicio, fecha, hora, idUsuario, costo, estado);
+                // Pasar el documento a la función obtenerIdDocumentoCita
+                obtenerIdDocumentoCita(document, servicio, fecha, hora, idUsuario, costo, estado);
             }
         });
 
         fila.addView(verButton);
         tabla.addView(fila);
+    }
+
+    private void obtenerIdDocumentoCita(QueryDocumentSnapshot document, String servicio, String fecha, String hora, String idUsuario, String costo, String estado) {
+        // Obtener el ID del documento en la colección "Citas"
+        String idDocumento = document.getId();
+
+        // Ahora puedes usar este idDocumento para realizar actualizaciones o referencias específicas a esta cita
+        actualizarEstadoCita(idDocumento);
+        verCitaController.mostrarDialogoCita(mainActivity.this, servicio, fecha, hora, idUsuario, costo, estado);
+    }
+
+    private void actualizarEstadoCita(String idDocumento) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Actualizar el campo "Estado" a "cancelado" para la cita específica
+        db.collection("Citas").document(idDocumento)
+                .update("Estado", "Cancelado")
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Éxito al actualizar el estado
+                        // Puedes realizar acciones adicionales si es necesario
+                    }
+                });
     }
 
     public static class verCitaController {
@@ -261,16 +273,27 @@ public class mainActivity extends AppCompatActivity {
             TextInputEditText mensajeC = view.findViewById(R.id.mensajeCan);
 
             correoC.setText(correo);
-            /*asuntoC.setText("Cancelación de cita");*/
+            asuntoC.setText("Cancelación de cita");
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
             builder.setTitle("Cancelación de cita");
-            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+            builder.setPositiveButton("Cerrar", (dialog, which) -> {
                 dialog.dismiss();
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+
+            btn_enviar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String correoDestino = correoC.getText().toString();
+                    String asunto = asuntoC.getText().toString();
+                    String msj = mensajeC.getText().toString();
+
+                    new enviarCorreo(context).execute(correoDestino, asunto, msj);
+                }
+            });
         }
     }
 

@@ -55,7 +55,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent irLogin = new Intent(restaurarContrasenaActivity.this, loginActivity.class);
                 startActivity(irLogin);
-                finish();
             }
         });
     }
