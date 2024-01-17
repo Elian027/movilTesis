@@ -16,9 +16,11 @@ import javax.mail.internet.MimeMessage;
 
 public class enviarCorreo extends AsyncTask<String, Void, Boolean> {
     private Context context;
+    private CorreoCallback correoCallback;
 
-    public enviarCorreo(Context context) {
+    public enviarCorreo(Context context, CorreoCallback correoCallback) {
         this.context = context;
+        this.correoCallback = correoCallback;
     }
 
     @Override
@@ -67,13 +69,16 @@ public class enviarCorreo extends AsyncTask<String, Void, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean success) {
-        if (success) {
-            // Éxito al enviar el correo
-            Toast.makeText(context, "Correo enviado exitosamente", Toast.LENGTH_SHORT).show();
-        } else {
-            // Error al enviar el correo
-            Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show();
+    protected void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
+
+        if (correoCallback != null) {
+            // Notificar al callback si el correo se envió correctamente
+            correoCallback.onCorreoEnviado(result);
         }
+    }
+
+    public interface CorreoCallback {
+        void onCorreoEnviado(boolean enviado);
     }
 }

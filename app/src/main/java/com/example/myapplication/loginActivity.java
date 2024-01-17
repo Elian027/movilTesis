@@ -42,6 +42,13 @@ public class loginActivity extends AppCompatActivity {
         btn_login = findViewById(R.id.ingresar);
         btn_recuperarPass = findViewById(R.id.olvidarContrasena);
 
+        // Verificar si el usuario ya está autenticado
+        if (mAuth.getCurrentUser() != null) {
+            // El usuario ya está autenticado, redirigir a la actividad principal
+            startActivity(new Intent(loginActivity.this, mainActivity.class));
+            finish();
+        }
+
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,30 +72,47 @@ public class loginActivity extends AppCompatActivity {
         });
     }
     private void verificarCampo() {
-        String usuarioID = mAuth.getCurrentUser().getUid();
-        DocumentReference empleadoRef = db.collection("Personal").document(usuarioID);
-
-        empleadoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot documento = task.getResult();
-                    if (documento.exists()) {
-                        if (documento.contains("Password")) {
-                            // El campo "Password" existe, dirigir a contrasenaNuevaActivity
-                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
-                            startActivity(irContrasena);
-                            finish();
+        FirebaseUser usuario = mAuth.getCurrentUser();
+        if (usuario != null) {
+            String usuarioID = mAuth.getCurrentUser().getUid();
+            DocumentReference empleadoRef = db.collection("Personal").document(usuarioID);
+            empleadoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documento = task.getResult();
+                        if (documento.exists()) {
+                            if (!documento.contains("ContrasenaCambiada")) {
+                                boolean contrasenaNueva = documento.getBoolean("contrasenaCambiada");
+                                if (!contrasenaNueva) {
+                                    Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+                                    startActivity(irContrasena);
+                                    finish();
+                                } else {
+                                    // El usuario existe y la contraseña ha sido cambiada
+                                    startActivity(new Intent(loginActivity.this, mainActivity.class));
+                                    Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            } else {
+                                // El usuario existe y tiene el campo "ContrasenaCambiada"
+                                startActivity(new Intent(loginActivity.this, mainActivity.class));
+                                Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
                         } else {
-                            // El campo "Password" no existe, dirigir a mainActivity
-                            startActivity(new Intent(loginActivity.this, mainActivity.class));
-                            Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                            // El usuario no existe, redirigir a la pantalla de inicio de sesión
+                            startActivity(new Intent(loginActivity.this, loginActivity.class));
                             finish();
                         }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            // No hay usuario autenticado, redirigir a la pantalla de inicio de sesión
+            startActivity(new Intent(loginActivity.this, loginActivity.class));
+            finish();
+        }
     }
 
     private void loginUsuario(String emailUser, String passUser) {

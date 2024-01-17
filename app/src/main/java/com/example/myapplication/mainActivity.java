@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -188,11 +189,10 @@ public class mainActivity extends AppCompatActivity {
         String idDocumento = document.getId();
 
         // Ahora puedes usar este idDocumento para realizar actualizaciones o referencias específicas a esta cita
-        actualizarEstadoCita(idDocumento);
-        verCitaController.mostrarDialogoCita(mainActivity.this, servicio, fecha, hora, idUsuario, costo, estado);
+        verCitaController.mostrarDialogoCita(mainActivity.this, servicio, fecha, hora, idUsuario, costo, estado, idDocumento);
     }
 
-    private void actualizarEstadoCita(String idDocumento) {
+    private static void actualizarEstadoCita(String idDocumento) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         // Actualizar el campo "Estado" a "cancelado" para la cita específica
         db.collection("Citas").document(idDocumento)
@@ -207,7 +207,7 @@ public class mainActivity extends AppCompatActivity {
     }
 
     public static class verCitaController {
-        public static void mostrarDialogoCita(Context context, String servicio, String fecha, String hora, String idUsuario, String costo, String estado) {
+        public static void mostrarDialogoCita(Context context, String servicio, String fecha, String hora, String idUsuario, String costo, String estado, String idDocumento) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             View view = LayoutInflater.from(context).inflate(R.layout.activity_cita_ver, null);
@@ -232,7 +232,7 @@ public class mainActivity extends AppCompatActivity {
                     if (document.exists()) {
                         String nombreUsuario = document.getString("Nombre");
                         String apellidoUsuario = document.getString("Apellido");
-                        correo[0] = document.getString("Correo");
+                        correo[0] = document.getString("Email");
 
                         etCliente.setText(nombreUsuario + " " + apellidoUsuario);
                     }
@@ -254,7 +254,7 @@ public class mainActivity extends AppCompatActivity {
             btn_cancelar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    editarCitaController.mostrarEditarCita(context, correo[0]);
+                    editarCitaController.mostrarEditarCita(context, correo[0], idDocumento);
                     alertDialog.dismiss();
                 }
             });
@@ -262,11 +262,10 @@ public class mainActivity extends AppCompatActivity {
     }
 
     public static class editarCitaController {
-        public static void mostrarEditarCita(Context context, String correo) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+        public static void mostrarEditarCita(Context context, String correo, String idDocumento) {
             View view = LayoutInflater.from(context).inflate(R.layout.activity_cita_cancelar, null);
 
-            //Propiedades de la vista
+            // Propiedades de la vista
             Button btn_enviar = view.findViewById(R.id.btnEnviarCorreo);
             TextInputEditText correoC = view.findViewById(R.id.correoCan);
             TextInputEditText asuntoC = view.findViewById(R.id.asuntoCan);
@@ -291,10 +290,25 @@ public class mainActivity extends AppCompatActivity {
                     String asunto = asuntoC.getText().toString();
                     String msj = mensajeC.getText().toString();
 
-                    new enviarCorreo(context).execute(correoDestino, asunto, msj);
+                    // Crear instancia de la tarea asíncrona para enviar correo
+                    enviarCorreo enviarCorreoTask = new enviarCorreo(context, new enviarCorreo.CorreoCallback() {
+                        @Override
+                        public void onCorreoEnviado(boolean enviado) {
+                            if (enviado) {
+                                Toast.makeText(context, "Correo enviado correctamente", Toast.LENGTH_SHORT).show();
+                                // Actualizar el estado de la cita solo cuando el correo se ha enviado correctamente
+                                actualizarEstadoCita(idDocumento);
+                                alertDialog.dismiss();
+                            } else {
+                                // Manejar el caso donde el correo no se envió correctamente
+                                Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    // Ejecutar la tarea asíncrona
+                    enviarCorreoTask.execute(correoDestino, asunto, msj);
                 }
             });
         }
     }
-
 }
