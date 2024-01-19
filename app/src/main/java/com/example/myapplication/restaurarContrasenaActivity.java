@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +11,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -29,7 +27,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurar_contrasena);
 
         db = FirebaseFirestore.getInstance();
-
 
         correoTextInputLayout = findViewById(R.id.correo);
         btnRecuperarContrasena = findViewById(R.id.btnRecuperarContrasena);
@@ -66,21 +63,19 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             if (!task.getResult().isEmpty()) {
-                                // Usuario encontrado en la base de datos
-                                String contrasenaTemporal = "STemporal01"; // Puedes generar una contraseña temporal
+                                String contrasenaTemporal = "STemporal01";
                                 String hashTemp = hashContrasenia.hashPassword(contrasenaTemporal);
 
-                                // Actualizar la contraseña en Firestore
+                                // Actualizar la contraseña
                                 String userId = task.getResult().getDocuments().get(0).getId();
                                 actualizarContrasena(userId, hashTemp);
 
-                                // Mostrar alerta con la nueva contraseña temporal
+                                // Muestra la alerta con la contraseña temporal
                                 mostrarAlertaNC(contrasenaTemporal);
                             } else {
                                 mostrarAlertaX("Correo no encontrado", "El correo no está registrado");
                             }
                         } else {
-                            // Manejar errores de la consulta
                             mostrarAlertaX("Error", "Error al verificar el correo");
                         }
                     }
@@ -91,7 +86,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
         mostrarAlerta("Nueva Contraseña", "Tu nueva contraseña temporal es: " + nuevaContrasenaTemporal, new Runnable() {
             @Override
             public void run() {
-                // Puedes realizar acciones adicionales después de mostrar la alerta
                 Intent irMain = new Intent(restaurarContrasenaActivity.this, loginActivity.class);
                 startActivity(irMain);
                 finish();
@@ -100,18 +94,17 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
     }
 
     private void actualizarContrasena(String userId, String nuevaContrasenaTemporal) {
-        // Actualizar el campo "Contrasenia" a la nueva contraseña temporal
         db.collection("Personal")
                 .document(userId)
                 .update("Contrasenia", nuevaContrasenaTemporal)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // Manejar éxito o error en la actualización
+
                         if (task.isSuccessful()) {
-                            // Éxito al actualizar la contraseña
+
                         } else {
-                            // Error al actualizar la contraseña
+
                         }
                     }
                 });

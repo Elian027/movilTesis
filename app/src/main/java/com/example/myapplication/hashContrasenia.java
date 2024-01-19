@@ -8,7 +8,6 @@ public class hashContrasenia {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
 
-            // Convertir los bytes hash a una representación hexadecimal
             StringBuilder stringBuilder = new StringBuilder();
             for (byte b : hashedBytes) {
                 stringBuilder.append(String.format("%02x", b));
@@ -17,7 +16,6 @@ public class hashContrasenia {
             return stringBuilder.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            // Manejar la excepción de algoritmo no encontrado según tus necesidades
             return null;
         }
     }

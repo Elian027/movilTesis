@@ -12,17 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,18 +76,17 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
 
         if (!usuarioID.isEmpty()) {
             String contraseniaHash = hashPassword(nuevaPassword);
-            // Actualizar el campo "Contrasenia" en la base de datos
             actualizarContrasenia(usuarioID, contraseniaHash);
         }
     }
 
     private String hashPassword(String password) {
-        // Generar el hash de la contraseña con BCrypt
+        // Genera el hash de la contraseña
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     private void actualizarContrasenia(String usuarioID, String nuevaPassword) {
-        // Actualizar el campo "Contrasenia" en la base de datos
+        // Actualiza la contraseña en la BD
         DocumentReference docRef = db.collection("Personal").document(usuarioID);
 
         Map<String, Object> updates = new HashMap<>();

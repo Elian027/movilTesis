@@ -17,7 +17,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.app.AlertDialog;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -34,7 +33,6 @@ import android.view.Gravity;
 public class mainActivity extends AppCompatActivity {
     Button btn_cerrar, btn_cambiar, btn_editar;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
-    String usuarioId;
     ImageView foto;
     TableLayout tabla;
 
@@ -88,14 +86,14 @@ public class mainActivity extends AppCompatActivity {
     }
 
     private void limpiarDatos() {
-        // Limpiar cualquier dato local que desees
+        // Limpia los datos almacenados
         nombreTextView.setText("");
         apellidoTextView.setText("");
         emailTextView.setText("");
         celularTextView.setText("");
-        tabla.removeAllViews(); // Limpiar filas de la tabla de citas
+        tabla.removeAllViews();
 
-        // Limpiar el ID almacenado en SharedPreferences
+        // Limpia el ID almacenado
         SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
@@ -105,7 +103,7 @@ public class mainActivity extends AppCompatActivity {
 
     private void cargarInformacion() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String usuarioId = obtenerId(); // Obtener el ID del usuario
+        String usuarioId = obtenerId();
 
         DocumentReference userRef = db.collection("Personal").document(usuarioId);
         userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -133,7 +131,7 @@ public class mainActivity extends AppCompatActivity {
 
     private void cargarCitas() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String usuarioId = obtenerId(); // Obtener el ID del usuario
+        String usuarioId = obtenerId();
 
         db.collection("Citas")
                 .whereEqualTo("IDEmpleado", usuarioId)
@@ -142,7 +140,6 @@ public class mainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            // Llama a agregarFila y pasa el documento
                             agregarFila(document);
                         }
                     }
@@ -152,7 +149,7 @@ public class mainActivity extends AppCompatActivity {
     private void agregarFila(QueryDocumentSnapshot document) {
         TableRow fila = new TableRow(this);
 
-        // Extrayendo valores
+        // Campos de cita
         String servicio = document.getString("Titulo");
         String fecha = document.getString("Fecha");
         String hora = document.getString("Hora");
@@ -191,8 +188,7 @@ public class mainActivity extends AppCompatActivity {
         verButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Pasar el documento a la función obtenerIdDocumentoCita
-                obtenerIdDocumentoCita(document, servicio, fecha, hora, idUsuario, costo, estado);
+                obtenerIdCita(document, servicio, fecha, hora, idUsuario, costo, estado);
             }
         });
 
@@ -200,24 +196,21 @@ public class mainActivity extends AppCompatActivity {
         tabla.addView(fila);
     }
 
-    private void obtenerIdDocumentoCita(QueryDocumentSnapshot document, String servicio, String fecha, String hora, String idUsuario, String costo, String estado) {
-        // Obtener el ID del documento en la colección "Citas"
+    private void obtenerIdCita(QueryDocumentSnapshot document, String servicio, String fecha, String hora, String idUsuario, String costo, String estado) {
+        // Obtiene el ID de la cita
         String idDocumento = document.getId();
 
-        // Ahora puedes usar este idDocumento para realizar actualizaciones o referencias específicas a esta cita
         verCitaController.mostrarDialogoCita(mainActivity.this, servicio, fecha, hora, idUsuario, costo, estado, idDocumento);
     }
 
     private static void actualizarEstadoCita(String idDocumento) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Actualizar el campo "Estado" a "cancelado" para la cita específica
+        // Cambia el estado a cancelado
         db.collection("Citas").document(idDocumento)
                 .update("Estado", "Cancelado")
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        // Éxito al actualizar el estado
-                        // Puedes realizar acciones adicionales si es necesario
                     }
                 });
     }
@@ -306,7 +299,7 @@ public class mainActivity extends AppCompatActivity {
                     String asunto = asuntoC.getText().toString();
                     String msj = mensajeC.getText().toString();
 
-                    // Crear instancia de la tarea asíncrona para enviar correo
+                    // Crea la instancia para enviar el correo
                     enviarCorreo enviarCorreoTask = new enviarCorreo(context, new enviarCorreo.CorreoCallback() {
                         @Override
                         public void onCorreoEnviado(boolean enviado) {
@@ -316,12 +309,10 @@ public class mainActivity extends AppCompatActivity {
                                 actualizarEstadoCita(idDocumento);
                                 alertDialog.dismiss();
                             } else {
-                                // Manejar el caso donde el correo no se envió correctamente
                                 Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                    // Ejecutar la tarea asíncrona
                     enviarCorreoTask.execute(correoDestino, asunto, msj);
                 }
             });
@@ -340,18 +331,18 @@ public class mainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             int numeroTotalCitas = task.getResult().size();
-                            // Obtener el número almacenado la última vez
+                            // Obten el número almacenado la última vez
                             SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
                             int numeroCitasAlmacenado = preferences.getInt("numeroCitas", 0);
                             Log.e("NUMERO DE CITAS", "NUMERO DE CITAS ALMACENADO: "+numeroCitasAlmacenado);
                             Log.e("NUMERO DE CITAS", "NUMERO DE CITAS NUEVO: "+numeroTotalCitas);
-                            // Comparar y mostrar la alerta
+                            // Compara y muestra la alerta
                             if (numeroTotalCitas > numeroCitasAlmacenado) {
-                                // Mostrar la alerta de que se han agendado nuevas citas
+                                // Muestra la alerta de nuevas citas agendadas
                                 mostrarAlerta("Nueva cita agendada", "Se han agendado nuevas citas desde la última vez que ingresó");
                             }
 
-                            // Guardar el nuevo número de citas en SharedPreferences
+                            // Guarda el nuevo número de citas
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.putInt("numeroCitas", numeroTotalCitas);
                             editor.apply();

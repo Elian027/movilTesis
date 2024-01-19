@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.Nullable;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -20,7 +19,6 @@ import android.content.Context;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,7 +27,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +34,6 @@ import java.util.Map;
 public class editar_perfilActivity extends AppCompatActivity {
     Button btn_guardar, btn_cancelar, btn_cambiar, btn_verHorario;
     ImageView btn_atras, foto;
-    FirebaseAuth mAuth;
     FirebaseFirestore db;
     EditText nombreET, apellidoET, emailET, celularET;
     String usuarioID;
@@ -200,9 +196,9 @@ public class editar_perfilActivity extends AppCompatActivity {
                 for (int i = 0; i < cajas.length; i++) {
                     CheckBox checkBox = cajas[i];
                     if (checkBox.isChecked()) {
-                        diasLaborables.add(i);  // Agregar día laborable
+                        diasLaborables.add(i);
                     } else {
-                        diasNoLaborables.add(i);  // Agregar día no laborable
+                        diasNoLaborables.add(i);
                     }
                 }
 
@@ -214,9 +210,8 @@ public class editar_perfilActivity extends AppCompatActivity {
                     Object[] arrayDiasLaborables = diasLaborables.toArray(new Object[0]);
                     Object[] arrayDiasNoLaborables = diasNoLaborables.toArray(new Object[0]);
 
-                    // Validar que "dias_laborables" no esté vacío
                     if (arrayDiasLaborables.length > 0) {
-                        // Actualizar en Firestore solo si hay días laborables seleccionados
+                        // Actualiza solo si hay días laborables seleccionados
                         actualizar(usuarioID, arrayDiasLaborables, arrayDiasNoLaborables);
                         dialog.dismiss();
                     } else {
@@ -232,10 +227,10 @@ public class editar_perfilActivity extends AppCompatActivity {
             drPersonal.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    // Obtener las listas de días laborables y no laborables
+                    // Obtiene los días laborables
                     List<Object> diasLaborables = (List<Object>) documentSnapshot.get("dias_laborables");
 
-                    // Verifica el estado de cada día y actualiza los CheckBox correspondientes
+                    // Carga el estado de cada día y actualiza los CheckBox
                     for (int i = 0; i < cajas.length; i++) {
                         CheckBox checkBox = cajas[i];
                         checkBox.setChecked(diasLaborables != null && diasLaborables.contains((long) (i)));
@@ -255,11 +250,11 @@ public class editar_perfilActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        // Manejar el éxito si es necesario
+
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Manejar el fallo si es necesario
+
                 });
     }
 
@@ -278,7 +273,7 @@ public class editar_perfilActivity extends AppCompatActivity {
             // Obtiene la Uri de la imagen seleccionada
             Uri uriImagen = data.getData();
 
-            // Obtiene la URL de la imagen y la sube al Storage de Firebase
+            // Obtiene la URL de la imagen y subir al Storage
             subirImagen(uriImagen);
         }
     }
@@ -299,10 +294,10 @@ public class editar_perfilActivity extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         urlImagen = uri.toString();
 
-                        // Mostrar imagen en el ImageView
+                        // Mostrar imagen
                         Picasso.get().load(urlImagen).into(foto);
 
-                        // Guarda la URL en Firestore
+                        // Guarda la URL
                         guardarUrl(urlImagen);
                         Toast.makeText(editar_perfilActivity.this, "Imagen subida exitosamente", Toast.LENGTH_SHORT).show();
                     }
@@ -326,7 +321,7 @@ public class editar_perfilActivity extends AppCompatActivity {
     }
 
     private void obtenerInformacionUsuario() {
-        String usuarioID = obtenerId(); // Obtener el ID del usuario desde las preferencias compartidas
+        String usuarioID = obtenerId();
 
         if (!usuarioID.isEmpty()) {
             db.collection("Personal").document(usuarioID).get()
@@ -345,7 +340,7 @@ public class editar_perfilActivity extends AppCompatActivity {
                                 emailET.setText(email);
                                 celularET.setText(celular);
 
-                                // Obtener la URL de la imagen y mostrarla en el ImageView
+                                // Obtener la URL de la imagen y mostrarla
                                 String urlImagen = document.getString("Foto");
                                 if (urlImagen != null && !urlImagen.isEmpty()) {
                                     Picasso.get().load(urlImagen).into(foto);
@@ -362,7 +357,7 @@ public class editar_perfilActivity extends AppCompatActivity {
     }
 
     private void guardarCambios() {
-        // Obtener los valores actuales de los EditText
+        // Obtener los valores actuales
         String nuevoNombre = nombreET.getText().toString().trim();
         String nuevoApellido = apellidoET.getText().toString().trim();
         String nuevoCelular = celularET.getText().toString().trim();

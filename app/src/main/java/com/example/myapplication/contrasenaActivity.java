@@ -11,13 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,11 +60,9 @@ public class contrasenaActivity extends AppCompatActivity {
                 String passConfirmar = contrasenaConf.getText().toString();
 
                 if (passNueva.equals(passConfirmar)) {
-                    // Obtener el ID del usuario actual
                     String userId = obtenerId();
 
                     if (userId != null) {
-                        // Realizar la verificación de la contraseña actual en la base de datos
                         verificarContrasenaActual(userId, passActual, passNueva);
                     } else {
                         mostrarError("Error", "No se pudo obtener el ID del usuario");
@@ -84,11 +79,10 @@ public class contrasenaActivity extends AppCompatActivity {
 
         usuarioRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Obtener la contraseña almacenada en la base de datos
+                // Trae la contraseña de la BD
                 String contrasenaAlmacenada = documentSnapshot.getString("Contrasenia");
 
                 if (contrasenaAlmacenada != null && BCrypt.checkpw(passActual, contrasenaAlmacenada)) {
-                    // La contraseña actual coincide, actualizar la contraseña en la base de datos
                     actualizarContrasena(userId, passNueva);
                 } else {
                     mostrarError("Error", "La contraseña actual es incorrecta");
@@ -98,7 +92,7 @@ public class contrasenaActivity extends AppCompatActivity {
     }
 
     private void actualizarContrasena(String userId, String nuevaContrasena) {
-        // Generar el hash de la nueva contraseña
+        // Genera el hash para la nueva contraseña
         String contraseniaHash = BCrypt.hashpw(nuevaContrasena, BCrypt.gensalt());
 
         DocumentReference usuarioRef = db.collection("Personal").document(userId);

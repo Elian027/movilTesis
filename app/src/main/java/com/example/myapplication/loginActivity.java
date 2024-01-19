@@ -2,7 +2,6 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,19 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import org.mindrot.jbcrypt.BCrypt;
 
 public class loginActivity extends AppCompatActivity {
@@ -70,7 +62,6 @@ public class loginActivity extends AppCompatActivity {
         });
     }
 
-    // Dentro del método loginUsuario
     private void loginUsuario(String emailUser, String passUser) {
         if (passUser.length() < 6) {
             mostrarAlerta("Error de inicio de sesión", "La contraseña debe tener al menos 6 caracteres");
@@ -86,9 +77,8 @@ public class loginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             if (!task.getResult().isEmpty()) {
-                                // Usuario encontrado en la base de datos
+                                // Usuario encontrado en la BD
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    // Aquí puedes acceder a los campos de cada documento
                                     String usuarioId = document.getId();
                                     Log.e("ID DE USUARIO", "Este es el id del usuario ingresado: " + usuarioId);
 
@@ -96,18 +86,17 @@ public class loginActivity extends AppCompatActivity {
                                     if (document.contains("contrasenaCambiada")) {
                                         boolean contrasenaCambiada = document.getBoolean("contrasenaCambiada");
 
-                                        // Realizar acciones basadas en los datos obtenidos
                                         if (contrasenaCambiada) {
                                             // La contraseña ha sido cambiada, verificar el hash
                                             String contraseniaAlmacenada = document.getString("Contrasenia");
 
                                             if (contraseniaAlmacenada != null && BCrypt.checkpw(passUser, contraseniaAlmacenada)) {
-                                                // Contraseña correcta (el hash coincide), redirigir a MainActivity
+                                                // Contraseña correcta
                                                 startActivity(new Intent(loginActivity.this, mainActivity.class));
                                                 Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
                                                 finish();
                                             } else {
-                                                // Contraseña incorrecta o fallo en la verificación
+                                                // Contraseña o correo incorrectos
                                                 password.setText("");
                                                 mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
                                             }
@@ -148,7 +137,7 @@ public class loginActivity extends AppCompatActivity {
 
 
     private void guardarID(String usuarioId) {
-        // Almacenar las credenciales en SharedPreferences
+        // Almacenar las credenciales
         SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("userId", usuarioId);
@@ -160,14 +149,13 @@ public class loginActivity extends AppCompatActivity {
         String userId = preferences.getString("userId", "");
 
         if (!userId.isEmpty()) {
-            // Iniciar directamente la MainActivity con el usuario almacenado
+            // Iniciar directamente con el usuario almacenado
             Intent irMain = new Intent(loginActivity.this, mainActivity.class);
             startActivity(irMain);
         } else {
             //
         }
     }
-
 
     private void mostrarAlerta(String titulo, String mensaje) {
         AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity.this);
