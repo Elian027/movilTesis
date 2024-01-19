@@ -16,12 +16,6 @@
       android:padding="16dp"
       app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/atras"
-        android:layout_width="40dp"
-        android:layout_height="30dp"
-        android:src="@drawable/arrow_left" />
-
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -138,13 +132,6 @@
           android:layout_height="wrap_content"
           android:orientation="horizontal"
           android:layout_marginTop="16dp">
-        <Button
-            android:id="@+id/cancelar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:text="Cancelar"
-            android:backgroundTint="#E54D71" />
 
         <Button
             android:id="@+id/guardar"

@@ -21,7 +21,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
     TextInputLayout correoTextInputLayout;
     Button btnRecuperarContrasena;
     ImageView btn_atras;
-    FirebaseAuth mAuth;
     FirebaseFirestore db;
 
     @Override
@@ -31,7 +30,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        mAuth = FirebaseAuth.getInstance();
 
         correoTextInputLayout = findViewById(R.id.correo);
         btnRecuperarContrasena = findViewById(R.id.btnRecuperarContrasena);
@@ -68,7 +66,16 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             if (!task.getResult().isEmpty()) {
-                                enviarCorreo(email);
+                                // Usuario encontrado en la base de datos
+                                String contrasenaTemporal = "STemporal01"; // Puedes generar una contraseña temporal
+                                String hashTemp = hashContrasenia.hashPassword(contrasenaTemporal);
+
+                                // Actualizar la contraseña en Firestore
+                                String userId = task.getResult().getDocuments().get(0).getId();
+                                actualizarContrasena(userId, hashTemp);
+
+                                // Mostrar alerta con la nueva contraseña temporal
+                                mostrarAlertaNC(contrasenaTemporal);
                             } else {
                                 mostrarAlertaX("Correo no encontrado", "El correo no está registrado");
                             }
@@ -80,19 +87,36 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                 });
     }
 
-    private void enviarCorreo(String email) {
-        mAuth.sendPasswordResetEmail(email)
+    private void mostrarAlertaNC(String nuevaContrasenaTemporal) {
+        mostrarAlerta("Nueva Contraseña", "Tu nueva contraseña temporal es: " + nuevaContrasenaTemporal, new Runnable() {
+            @Override
+            public void run() {
+                // Puedes realizar acciones adicionales después de mostrar la alerta
+                Intent irMain = new Intent(restaurarContrasenaActivity.this, loginActivity.class);
+                startActivity(irMain);
+                finish();
+            }
+        });
+    }
+
+    private void actualizarContrasena(String userId, String nuevaContrasenaTemporal) {
+        // Actualizar el campo "Contrasenia" a la nueva contraseña temporal
+        db.collection("Personal")
+                .document(userId)
+                .update("Contrasenia", nuevaContrasenaTemporal)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        // Manejar éxito o error en la actualización
                         if (task.isSuccessful()) {
-                            mostrarAlertaExito();
+                            // Éxito al actualizar la contraseña
                         } else {
-                            mostrarAlertaX("Error", "Error al enviar el correo de restablecimiento de contraseña");
+                            // Error al actualizar la contraseña
                         }
                     }
                 });
     }
+
     private void mostrarAlerta(String titulo, String mensaje, Runnable onAceptar) {
         if (!isFinishing()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(restaurarContrasenaActivity.this);
@@ -110,14 +134,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
 
     private void mostrarAlertaX(String titulo, String mensaje) {
         mostrarAlerta(titulo, mensaje, null);
-    }
-
-    private void mostrarAlertaExito() {
-        mostrarAlerta("Éxito", "Se ha enviado un correo para restablecer la contraseña", () -> {
-            Intent irMain = new Intent(restaurarContrasenaActivity.this, loginActivity.class);
-            startActivity(irMain);
-            finish();
-        });
     }
 
 }

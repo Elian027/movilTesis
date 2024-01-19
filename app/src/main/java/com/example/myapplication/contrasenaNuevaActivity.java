@@ -3,7 +3,9 @@ package com.example.myapplication;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,6 +21,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,21 +30,21 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
     ImageView btn_atras;
     TextInputEditText nuevaPass, confirmarPass;
     Button btn_guardar;
-    FirebaseAuth mAuth;
     FirebaseFirestore db;
+    String usuarioID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contrasena_nueva);
 
-        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         btn_atras = findViewById(R.id.atras);
         nuevaPass = findViewById(R.id.contrasenaNueva);
         confirmarPass = findViewById(R.id.confirmarContrasena);
         btn_guardar = findViewById(R.id.guardar);
+        usuarioID = obtenerId();
 
         btn_atras.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,39 +81,37 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
             return;
         }
 
-        // Validaciones pasadas, proceder a actualizar la contraseña en Firebase Authentication
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            user.updatePassword(nuevaPassword)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            // Contraseña actualizada con éxito
-                            // Ahora, eliminar el campo "Password" en la base de datos
-                            eliminarCampo(user.getUid());
-                        } else {
-                            Toast.makeText(contrasenaNuevaActivity.this, "Error al actualizar la contraseña", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+        if (!usuarioID.isEmpty()) {
+            String contraseniaHash = hashPassword(nuevaPassword);
+            // Actualizar el campo "Contrasenia" en la base de datos
+            actualizarContrasenia(usuarioID, contraseniaHash);
         }
     }
 
-    private void eliminarCampo(String usuarioID) {
-        DocumentReference empleadoRef = db.collection("Personal").document(usuarioID);
-        // Crear un Map sin el campo "Password"
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("Password", FieldValue.delete());
+    private String hashPassword(String password) {
+        // Generar el hash de la contraseña con BCrypt
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
 
-        // Actualizar el documento en Firestore
-        empleadoRef.update(updates)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        mostrarAlertaExito();
-                    } else {
-                        // Error al eliminar el campo "Password"
-                        Toast.makeText(contrasenaNuevaActivity.this, "Error al eliminar el campo \"Password\"", Toast.LENGTH_SHORT).show();
-                    }
+    private void actualizarContrasenia(String usuarioID, String nuevaPassword) {
+        // Actualizar el campo "Contrasenia" en la base de datos
+        DocumentReference docRef = db.collection("Personal").document(usuarioID);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("Contrasenia", nuevaPassword);
+        updates.put("contrasenaCambiada", true);
+
+        docRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    // Actualización exitosa
+                    mostrarAlertaExito(); // Mostrar alerta de éxito
+                })
+                .addOnFailureListener(e -> {
+                    // Manejar el fallo si es necesario
+                    Toast.makeText(contrasenaNuevaActivity.this, "Error al actualizar la contraseña en la base de datos", Toast.LENGTH_SHORT).show();
                 });
     }
+
     private void mostrarAlerta(String titulo, String mensaje, Runnable onAceptar) {
         if (!isFinishing()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(contrasenaNuevaActivity.this);
@@ -131,4 +133,10 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
             startActivity(irMain);
         });
     }
+
+    private String obtenerId() {
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        return preferences.getString("userId","");
+    }
+
 }

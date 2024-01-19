@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -15,10 +17,12 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.app.AlertDialog;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import androidx.annotation.NonNull;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,7 +33,6 @@ import android.view.Gravity;
 
 public class mainActivity extends AppCompatActivity {
     Button btn_cerrar, btn_cambiar, btn_editar;
-    FirebaseAuth mAuth;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
     String usuarioId;
     ImageView foto;
@@ -39,8 +42,6 @@ public class mainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mAuth = FirebaseAuth.getInstance();
 
         btn_cerrar = findViewById(R.id.cerrar);
         btn_cambiar = findViewById(R.id.cambiar);
@@ -56,6 +57,7 @@ public class mainActivity extends AppCompatActivity {
 
         cargarInformacion();
         cargarCitas();
+        verificarCitas();
 
         btn_editar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +70,11 @@ public class mainActivity extends AppCompatActivity {
         btn_cerrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.signOut();
+                limpiarDatos();
 
                 Intent main_to_log = new Intent(mainActivity.this, loginActivity.class);
                 startActivity(main_to_log);
+                finish();
             }
         });
 
@@ -84,40 +87,53 @@ public class mainActivity extends AppCompatActivity {
         });
     }
 
+    private void limpiarDatos() {
+        // Limpiar cualquier dato local que desees
+        nombreTextView.setText("");
+        apellidoTextView.setText("");
+        emailTextView.setText("");
+        celularTextView.setText("");
+        tabla.removeAllViews(); // Limpiar filas de la tabla de citas
+
+        // Limpiar el ID almacenado en SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+
     private void cargarInformacion() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser usuario = mAuth.getCurrentUser();
+        String usuarioId = obtenerId(); // Obtener el ID del usuario
 
-        if (usuario != null) {
-            usuarioId = usuario.getUid();
-            DocumentReference userRef = db.collection("Personal").document(usuarioId);
-            userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot document) {
-                    if (document.exists()) {
-                        String urlImagen = document.getString("Foto");
-                        if (urlImagen != null && !urlImagen.isEmpty()) {
-                            Picasso.get().load(urlImagen).into(foto);
-                        }
-
-                        String nombre = document.getString("Nombre");
-                        String apellido = document.getString("Apellido");
-                        String email = document.getString("Email");
-                        String celular = document.getString("Telefono");
-
-                        nombreTextView.setText("Nombre: " + nombre);
-                        apellidoTextView.setText("Apellido: " + apellido);
-                        emailTextView.setText("Email: " + email);
-                        celularTextView.setText("Celular: " + celular);
-
+        DocumentReference userRef = db.collection("Personal").document(usuarioId);
+        userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot document) {
+                if (document.exists()) {
+                    String urlImagen = document.getString("Foto");
+                    if (urlImagen != null && !urlImagen.isEmpty()) {
+                        Picasso.get().load(urlImagen).into(foto);
                     }
+
+                    String nombre = document.getString("Nombre");
+                    String apellido = document.getString("Apellido");
+                    String email = document.getString("Email");
+                    String celular = document.getString("Telefono");
+
+                    nombreTextView.setText("Nombre: " + nombre);
+                    apellidoTextView.setText("Apellido: " + apellido);
+                    emailTextView.setText("Email: " + email);
+                    celularTextView.setText("Celular: " + celular);
                 }
-            });
-        }
+            }
+        });
     }
 
     private void cargarCitas() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String usuarioId = obtenerId(); // Obtener el ID del usuario
 
         db.collection("Citas")
                 .whereEqualTo("IDEmpleado", usuarioId)
@@ -310,5 +326,51 @@ public class mainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void verificarCitas() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String usuarioId = obtenerId();
+
+        db.collection("Citas")
+                .whereEqualTo("IDEmpleado", usuarioId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            int numeroTotalCitas = task.getResult().size();
+                            // Obtener el número almacenado la última vez
+                            SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+                            int numeroCitasAlmacenado = preferences.getInt("numeroCitas", 0);
+                            Log.e("NUMERO DE CITAS", "NUMERO DE CITAS ALMACENADO: "+numeroCitasAlmacenado);
+                            Log.e("NUMERO DE CITAS", "NUMERO DE CITAS NUEVO: "+numeroTotalCitas);
+                            // Comparar y mostrar la alerta
+                            if (numeroTotalCitas > numeroCitasAlmacenado) {
+                                // Mostrar la alerta de que se han agendado nuevas citas
+                                mostrarAlerta("Nueva cita agendada", "Se han agendado nuevas citas desde la última vez que ingresó");
+                            }
+
+                            // Guardar el nuevo número de citas en SharedPreferences
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putInt("numeroCitas", numeroTotalCitas);
+                            editor.apply();
+                        }
+                    }
+                });
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(mainActivity.this);
+        builder.setTitle(titulo)
+                .setMessage(mensaje)
+                .setPositiveButton("Aceptar", null);
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private String obtenerId() {
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        return preferences.getString("userId","");
     }
 }

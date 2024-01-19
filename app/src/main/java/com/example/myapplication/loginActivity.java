@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,11 +23,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 public class loginActivity extends AppCompatActivity {
     Button btn_login;
-    FirebaseAuth mAuth;
     FirebaseFirestore db;
     TextInputEditText email ,password;
     TextView btn_recuperarPass;
@@ -35,19 +38,14 @@ public class loginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mAuth = FirebaseAuth.getInstance();
+
         db = FirebaseFirestore.getInstance();
         email = findViewById(R.id.correo);
         password = findViewById(R.id.pass);
         btn_login = findViewById(R.id.ingresar);
         btn_recuperarPass = findViewById(R.id.olvidarContrasena);
 
-        // Verificar si el usuario ya está autenticado
-        if (mAuth.getCurrentUser() != null) {
-            // El usuario ya está autenticado, redirigir a la actividad principal
-            startActivity(new Intent(loginActivity.this, mainActivity.class));
-            finish();
-        }
+        verificarSesion();
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,50 +69,8 @@ public class loginActivity extends AppCompatActivity {
             }
         });
     }
-    private void verificarCampo() {
-        FirebaseUser usuario = mAuth.getCurrentUser();
-        if (usuario != null) {
-            String usuarioID = mAuth.getCurrentUser().getUid();
-            DocumentReference empleadoRef = db.collection("Personal").document(usuarioID);
-            empleadoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot documento = task.getResult();
-                        if (documento.exists()) {
-                            if (!documento.contains("ContrasenaCambiada")) {
-                                boolean contrasenaNueva = documento.getBoolean("contrasenaCambiada");
-                                if (!contrasenaNueva) {
-                                    Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
-                                    startActivity(irContrasena);
-                                    finish();
-                                } else {
-                                    // El usuario existe y la contraseña ha sido cambiada
-                                    startActivity(new Intent(loginActivity.this, mainActivity.class));
-                                    Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
-                            } else {
-                                // El usuario existe y tiene el campo "ContrasenaCambiada"
-                                startActivity(new Intent(loginActivity.this, mainActivity.class));
-                                Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        } else {
-                            // El usuario no existe, redirigir a la pantalla de inicio de sesión
-                            startActivity(new Intent(loginActivity.this, loginActivity.class));
-                            finish();
-                        }
-                    }
-                }
-            });
-        } else {
-            // No hay usuario autenticado, redirigir a la pantalla de inicio de sesión
-            startActivity(new Intent(loginActivity.this, loginActivity.class));
-            finish();
-        }
-    }
 
+    // Dentro del método loginUsuario
     private void loginUsuario(String emailUser, String passUser) {
         if (passUser.length() < 6) {
             mostrarAlerta("Error de inicio de sesión", "La contraseña debe tener al menos 6 caracteres");
@@ -130,42 +86,88 @@ public class loginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             if (!task.getResult().isEmpty()) {
-                                mAuth.signInWithEmailAndPassword(emailUser, passUser)
-                                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> authTask) {
-                                                if (authTask.isSuccessful()) {
-                                                    FirebaseUser usuarioX = mAuth.getCurrentUser();
-                                                    saveUserCredentials(usuarioX.getEmail(), usuarioX.getUid());
-                                                    verificarCampo();
-                                                } else {
-                                                    mostrarAlerta("Error de inicio de sesión", "Correo o contraseña incorrectos");
-                                                    password.setText("");
-                                                }
+                                // Usuario encontrado en la base de datos
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    // Aquí puedes acceder a los campos de cada documento
+                                    String usuarioId = document.getId();
+                                    Log.e("ID DE USUARIO", "Este es el id del usuario ingresado: " + usuarioId);
+
+                                    // Verificar si existe el campo "contrasenaCambiada"
+                                    if (document.contains("contrasenaCambiada")) {
+                                        boolean contrasenaCambiada = document.getBoolean("contrasenaCambiada");
+
+                                        // Realizar acciones basadas en los datos obtenidos
+                                        if (contrasenaCambiada) {
+                                            // La contraseña ha sido cambiada, verificar el hash
+                                            String contraseniaAlmacenada = document.getString("Contrasenia");
+
+                                            if (contraseniaAlmacenada != null && BCrypt.checkpw(passUser, contraseniaAlmacenada)) {
+                                                // Contraseña correcta (el hash coincide), redirigir a MainActivity
+                                                startActivity(new Intent(loginActivity.this, mainActivity.class));
+                                                Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            } else {
+                                                // Contraseña incorrecta o fallo en la verificación
+                                                password.setText("");
+                                                mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
                                             }
-                                        });
+                                        } else {
+                                            // La contraseña no ha sido cambiada, redirigir a la pantalla de cambio de contraseña
+                                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+                                            startActivity(irContrasena);
+                                            finish();
+                                        }
+                                    } else {
+                                        String contraseniaAlmacenada = document.getString("Contrasenia");
+                                        if (contraseniaAlmacenada != null && contraseniaAlmacenada.equals(passUser)) {
+                                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+                                            startActivity(irContrasena);
+                                            finish();
+                                        } else {
+                                            password.setText("");
+                                            mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
+                                        }
+                                    }
+
+                                    // Guardar el ID del usuario
+                                    guardarID(usuarioId);
+                                }
                             } else {
+                                // Usuario no encontrado en la base de datos
                                 mostrarAlerta("Error de inicio de sesión", "El usuario no está registrado");
                                 password.setText("");
                             }
                         } else {
                             mostrarAlerta("Error de inicio de sesión", "Error al verificar el correo en la base de datos");
-                            password.setText("");
                         }
                     }
                 });
     }
 
-    private void saveUserCredentials(String userEmail, String userId) {
+
+
+
+    private void guardarID(String usuarioId) {
         // Almacenar las credenciales en SharedPreferences
         SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString("email", userEmail);
-        editor.putString("userId", userId);
-
+        editor.putString("userId", usuarioId);
         editor.apply();
     }
+
+    private void verificarSesion() {
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        String userId = preferences.getString("userId", "");
+
+        if (!userId.isEmpty()) {
+            // Iniciar directamente la MainActivity con el usuario almacenado
+            Intent irMain = new Intent(loginActivity.this, mainActivity.class);
+            startActivity(irMain);
+        } else {
+            //
+        }
+    }
+
 
     private void mostrarAlerta(String titulo, String mensaje) {
         AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity.this);

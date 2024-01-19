@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.Nullable;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,9 +50,8 @@ public class editar_perfilActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_perfil);
 
-        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        usuarioID = mAuth.getCurrentUser().getUid();
+        usuarioID = obtenerId();
 
         nombreET = findViewById(R.id.nombre);
         apellidoET = findViewById(R.id.apellido);
@@ -137,12 +137,12 @@ public class editar_perfilActivity extends AppCompatActivity {
                     Log.d("MostrarHorarioController", "Días laborables: " + diasLaborablesObject);
 
                     // Verifica el estado de cada día y actualiza los CheckBox correspondientes
-                    cargarCheckBox(caja_lunes, diasLaborablesObject, 1);
-                    cargarCheckBox(caja_martes, diasLaborablesObject, 2);
-                    cargarCheckBox(caja_miercoles, diasLaborablesObject, 3);
-                    cargarCheckBox(caja_jueves, diasLaborablesObject, 4);
-                    cargarCheckBox(caja_viernes, diasLaborablesObject, 5);
-                    cargarCheckBox(caja_sabado, diasLaborablesObject, 6);
+                    cargarCheckBox(caja_lunes, diasLaborablesObject, 0);
+                    cargarCheckBox(caja_martes, diasLaborablesObject, 1);
+                    cargarCheckBox(caja_miercoles, diasLaborablesObject, 2);
+                    cargarCheckBox(caja_jueves, diasLaborablesObject, 3);
+                    cargarCheckBox(caja_viernes, diasLaborablesObject, 4);
+                    cargarCheckBox(caja_sabado, diasLaborablesObject, 5);
                 }
             });
 
@@ -200,15 +200,15 @@ public class editar_perfilActivity extends AppCompatActivity {
                 for (int i = 0; i < cajas.length; i++) {
                     CheckBox checkBox = cajas[i];
                     if (checkBox.isChecked()) {
-                        diasLaborables.add(i + 1);  // Agregar día laborable
+                        diasLaborables.add(i);  // Agregar día laborable
                     } else {
-                        diasNoLaborables.add(i + 1);  // Agregar día no laborable
+                        diasNoLaborables.add(i);  // Agregar día no laborable
                     }
                 }
 
                 if (!diasLaborables.isEmpty()) {
-                    if (!diasNoLaborables.contains(0)) {
-                        diasNoLaborables.add(0);
+                    if (!diasNoLaborables.contains(6)) {
+                        diasNoLaborables.add(6);
                     }
 
                     Object[] arrayDiasLaborables = diasLaborables.toArray(new Object[0]);
@@ -238,7 +238,7 @@ public class editar_perfilActivity extends AppCompatActivity {
                     // Verifica el estado de cada día y actualiza los CheckBox correspondientes
                     for (int i = 0; i < cajas.length; i++) {
                         CheckBox checkBox = cajas[i];
-                        checkBox.setChecked(diasLaborables != null && diasLaborables.contains((long) (i + 1)));
+                        checkBox.setChecked(diasLaborables != null && diasLaborables.contains((long) (i)));
                     }
                 }
             });
@@ -326,32 +326,39 @@ public class editar_perfilActivity extends AppCompatActivity {
     }
 
     private void obtenerInformacionUsuario() {
-        db.collection("Personal").document(usuarioID).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot document) {
-                        if (document.exists()) {
-                            String nombre = document.getString("Nombre");
-                            String apellido = document.getString("Apellido");
-                            String email = document.getString("Email");
-                            String celular = document.getString("Telefono");
+        String usuarioID = obtenerId(); // Obtener el ID del usuario desde las preferencias compartidas
 
-                            // Cargar la información en los EditText
-                            nombreET.setText(nombre);
-                            apellidoET.setText(apellido);
-                            emailET.setText(email);
-                            celularET.setText(celular);
+        if (!usuarioID.isEmpty()) {
+            db.collection("Personal").document(usuarioID).get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot document) {
+                            if (document.exists()) {
+                                String nombre = document.getString("Nombre");
+                                String apellido = document.getString("Apellido");
+                                String email = document.getString("Email");
+                                String celular = document.getString("Telefono");
 
-                            // Obtener la URL de la imagen y mostrarla en el ImageView
-                            String urlImagen = document.getString("Foto");
-                            if (urlImagen != null && !urlImagen.isEmpty()) {
-                                Picasso.get().load(urlImagen).into(foto);
+                                // Cargar la información en los EditText
+                                nombreET.setText(nombre);
+                                apellidoET.setText(apellido);
+                                emailET.setText(email);
+                                celularET.setText(celular);
+
+                                // Obtener la URL de la imagen y mostrarla en el ImageView
+                                String urlImagen = document.getString("Foto");
+                                if (urlImagen != null && !urlImagen.isEmpty()) {
+                                    Picasso.get().load(urlImagen).into(foto);
+                                }
+                            } else {
+                                Toast.makeText(editar_perfilActivity.this, "Error al obtener información del usuario", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(editar_perfilActivity.this, "Error al obtener información del usuario", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
+                    });
+        } else {
+            // Manejar el caso cuando no se puede obtener el ID del usuario
+            Toast.makeText(editar_perfilActivity.this, "Error al obtener ID del usuario", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void guardarCambios() {
@@ -377,6 +384,11 @@ public class editar_perfilActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(editar_perfilActivity.this, "Error al guardar cambios", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private String obtenerId() {
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        return preferences.getString("userId","");
     }
 
 }

@@ -2,12 +2,17 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -19,9 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 public class fechaActivity extends AppCompatActivity {
-    Button btn_guardar, btn_cancelar, btn_atras;
+    Button btn_guardar;
     CheckBox caja_lunes, caja_martes, caja_miercoles, caja_jueves, caja_viernes, caja_sabado;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    String usuarioID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +35,6 @@ public class fechaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fecha);
 
         btn_guardar = findViewById(R.id.guardar);
-        btn_cancelar = findViewById(R.id.cancelar);
-        btn_atras = findViewById(R.id.atras);
 
         caja_lunes = findViewById(R.id.lunes);
         caja_martes = findViewById(R.id.martes);
@@ -39,13 +43,7 @@ public class fechaActivity extends AppCompatActivity {
         caja_viernes = findViewById(R.id.viernes);
         caja_sabado = findViewById(R.id.sabado);
 
-        btn_cancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent fecha_to_log = new Intent(fechaActivity.this, loginActivity.class);
-                startActivity(fecha_to_log);
-            }
-        });
+        usuarioID = obtenerId();
 
         btn_guardar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,14 +52,6 @@ public class fechaActivity extends AppCompatActivity {
             }
         });
         cargarDias();
-
-        btn_atras.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent fecha_to_log = new Intent(fechaActivity.this, loginActivity.class);
-                startActivity(fecha_to_log);
-            }
-        });
     }
 
     private void mostrarAlerta(String titulo, String mensaje, Runnable onAceptar) {
@@ -92,9 +82,7 @@ public class fechaActivity extends AppCompatActivity {
 
     private void cargarDias() {
         // Obtener los días desde la base de datos y marcar las CheckBox correspondientes
-        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
-        if (usuario != null) {
-            String usuarioID = usuario.getUid();
+        if (usuarioID != null) {
 
             DocumentReference drPersonal = db.collection("Personal").document(usuarioID);
             drPersonal.get().addOnSuccessListener(documentSnapshot -> {
@@ -114,22 +102,22 @@ public class fechaActivity extends AppCompatActivity {
 
     private void marcarCheckBoxSegunDia(int diaLaborable) {
         switch (diaLaborable) {
-            case 1:
+            case 0:
                 caja_lunes.setChecked(true);
                 break;
-            case 2:
+            case 1:
                 caja_martes.setChecked(true);
                 break;
-            case 3:
+            case 2:
                 caja_miercoles.setChecked(true);
                 break;
-            case 4:
+            case 3:
                 caja_jueves.setChecked(true);
                 break;
-            case 5:
+            case 4:
                 caja_viernes.setChecked(true);
                 break;
-            case 6:
+            case 5:
                 caja_sabado.setChecked(true);
                 break;
             default:
@@ -138,9 +126,7 @@ public class fechaActivity extends AppCompatActivity {
     }
 
     private void guardarDias() {
-        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
-        if (usuario != null) {
-            String usuarioID = usuario.getUid();
+        if (usuarioID != null) {
 
             Map<String, Object> empleadoData = obtenerDiasSeleccionados();
 
@@ -162,41 +148,41 @@ public class fechaActivity extends AppCompatActivity {
         List<Integer> diasNoLaborables = new ArrayList<>();
 
         if (caja_lunes.isChecked()) {
+            diasLaborables.add(0);
+        } else {
+            diasNoLaborables.add(0);
+        }
+
+        if (caja_martes.isChecked()) {
             diasLaborables.add(1);
         } else {
             diasNoLaborables.add(1);
         }
 
-        if (caja_martes.isChecked()) {
+        if (caja_miercoles.isChecked()) {
             diasLaborables.add(2);
         } else {
             diasNoLaborables.add(2);
         }
 
-        if (caja_miercoles.isChecked()) {
+        if (caja_jueves.isChecked()) {
             diasLaborables.add(3);
         } else {
             diasNoLaborables.add(3);
         }
-
-        if (caja_jueves.isChecked()) {
+        if (caja_viernes.isChecked()) {
             diasLaborables.add(4);
         } else {
             diasNoLaborables.add(4);
         }
-        if (caja_viernes.isChecked()) {
+
+        if (caja_sabado.isChecked()) {
             diasLaborables.add(5);
         } else {
             diasNoLaborables.add(5);
         }
 
-        if (caja_sabado.isChecked()) {
-            diasLaborables.add(6);
-        } else {
-            diasNoLaborables.add(6);
-        }
-
-        diasNoLaborables.add(0);
+        diasNoLaborables.add(6);
 
         diasSeleccionados.put("dias_laborables", diasLaborables);
         diasSeleccionados.put("dias_no_laborables", diasNoLaborables);
@@ -221,5 +207,10 @@ public class fechaActivity extends AppCompatActivity {
         Log.d("VerificarDias", "Días laborables antes de la verificación: " + diasLaborables);
 
         return (diasLaborables != null && !diasLaborables.isEmpty());
+    }
+
+    private String obtenerId() {
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        return preferences.getString("userId","");
     }
 }
