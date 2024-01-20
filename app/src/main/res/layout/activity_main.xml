@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".mainActivity">
 
-    <!-- CardView con 2 columnas -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
@@ -26,7 +25,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <!-- Columna izquierda con una imagen -->
             <ImageView
                 android:id="@+id/fotoEmpleado"
                 android:layout_width="0dp"
@@ -35,7 +33,6 @@
                 android:scaleType="centerCrop"
                 app:srcCompat="@android:drawable/sym_def_app_icon" />
 
-            <!-- Columna derecha con información personal -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -49,7 +46,6 @@
                     android:text="Información personal"
                     android:textStyle="bold"/>
 
-                <!-- Nombre y Apellido -->
                 <TextView
                     android:id="@+id/nombre"
                     android:layout_width="match_parent"
@@ -80,7 +76,6 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Otra CardView con botones -->
     <androidx.cardview.widget.CardView
         android:id="@+id/botones"
         android:layout_width="0dp"
@@ -88,7 +83,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,31 +94,40 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <!-- Botón "Editar Perfil" -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/editar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Editar perfil" />
+                android:maxLines="2"
+                android:text="Editar perfil"
+                android:textSize="12sp"
+                app:cornerRadius="10dp" />
 
-            <!-- Botón "Cambiar Contraseña" -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/cambiar"
-                android:layout_width="24dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="Cambiar contraseña" />
+                android:maxLines="2"
+                android:text="Cambiar contraseña"
+                android:textSize="12sp"
+                app:cornerRadius="10dp"/>
 
-            <!-- Botón "Cerrar Sesión" -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/cerrar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="Cerrar sesión" />
+                android:maxLines="2"
+                android:text="Cerrar sesión"
+                android:textSize="12sp"
+                app:cornerRadius="10dp" />
+
+
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -146,7 +149,6 @@
             android:layout_height="wrap_content"
             android:stretchColumns="*">
 
-            <!-- Fila de encabezado -->
             <TableRow>
                 <TextView
                     android:layout_width="0dp"
@@ -186,7 +188,5 @@
             </TableRow>
 
         </TableLayout>
-
     </androidx.cardview.widget.CardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

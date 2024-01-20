@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.view.Window;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,6 +22,8 @@ import java.util.Map;
 public class contrasenaActivity extends AppCompatActivity {
     TextInputEditText contrasenaActual, contrasenaNueva, contrasenaConf;
     FirebaseFirestore db;
+    ImageView btn_atras;
+    Button btn_cancelar, btn_guardar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +32,9 @@ public class contrasenaActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        ImageView btn_atras = findViewById(R.id.atras);
-        Button btn_cancelar = findViewById(R.id.cancelar);
-        Button btn_guardar = findViewById(R.id.guardar);
+        btn_atras = findViewById(R.id.atras);
+        btn_cancelar = findViewById(R.id.cancelar);
+        btn_guardar = findViewById(R.id.guardar);
         contrasenaActual = findViewById(R.id.pass_actual);
         contrasenaNueva = findViewById(R.id.pass_nueva);
         contrasenaConf = findViewById(R.id.pass_confirmar);

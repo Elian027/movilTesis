@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +24,7 @@ import java.util.Map;
 public class contrasenaNuevaActivity extends AppCompatActivity {
     ImageView btn_atras;
     TextInputEditText nuevaPass, confirmarPass;
-    Button btn_guardar;
+    MaterialButton btn_guardar;
     FirebaseFirestore db;
     String usuarioID;
 

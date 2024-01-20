@@ -19,6 +19,7 @@ import android.content.Context;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class editar_perfilActivity extends AppCompatActivity {
-    Button btn_guardar, btn_cancelar, btn_cambiar, btn_verHorario;
+    MaterialButton btn_guardar, btn_cancelar, btn_cambiar, btn_verHorario;
     ImageView btn_atras, foto;
     FirebaseFirestore db;
     EditText nombreET, apellidoET, emailET, celularET;
@@ -55,8 +56,8 @@ public class editar_perfilActivity extends AppCompatActivity {
         celularET = findViewById(R.id.telefono);
 
         btn_atras = findViewById(R.id.atras);
-        btn_cancelar = findViewById(R.id.botonCancelar);
-        btn_guardar = findViewById(R.id.botonGuardar);
+        btn_cancelar = findViewById(R.id.cancelar);
+        btn_guardar = findViewById(R.id.guardar);
         btn_cambiar = findViewById(R.id.botonFoto);
         btn_verHorario = findViewById(R.id.botonHorario);
 

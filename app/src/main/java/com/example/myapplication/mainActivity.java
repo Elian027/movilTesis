@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -20,6 +21,7 @@ import android.app.AlertDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import androidx.annotation.NonNull;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,7 +33,7 @@ import com.squareup.picasso.Picasso;
 import android.view.Gravity;
 
 public class mainActivity extends AppCompatActivity {
-    Button btn_cerrar, btn_cambiar, btn_editar;
+    MaterialButton btn_cerrar, btn_cambiar, btn_editar;
     TextView nombreTextView, apellidoTextView, emailTextView, celularTextView;
     ImageView foto;
     TableLayout tabla;
@@ -305,7 +307,7 @@ public class mainActivity extends AppCompatActivity {
                         public void onCorreoEnviado(boolean enviado) {
                             if (enviado) {
                                 Toast.makeText(context, "Correo enviado correctamente", Toast.LENGTH_SHORT).show();
-                                // Actualizar el estado de la cita solo cuando el correo se ha enviado correctamente
+                                // Actualiza el estado de la cita luego de enviar el corre
                                 actualizarEstadoCita(idDocumento);
                                 alertDialog.dismiss();
                             } else {
@@ -331,7 +333,7 @@ public class mainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             int numeroTotalCitas = task.getResult().size();
-                            // Obten el número almacenado la última vez
+                            // Trae el número almacenado la última vez
                             SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
                             int numeroCitasAlmacenado = preferences.getInt("numeroCitas", 0);
                             Log.e("NUMERO DE CITAS", "NUMERO DE CITAS ALMACENADO: "+numeroCitasAlmacenado);

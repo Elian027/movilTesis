@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".mainActivity">
 
-    <!-- Rectángulo Cambio de Contraseña -->
     <LinearLayout
         android:id="@+id/rectanguloCambioContraseña"
         android:layout_width="match_parent"
@@ -17,7 +16,6 @@
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Texto "Cambio de contraseña" -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -49,7 +47,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Mensaje de cambio de contraseña exitoso -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +57,6 @@
                 android:paddingTop="100dp"
                 android:paddingBottom="20dp" />
 
-            <!-- Botón "Continuar" -->
             <Button
                 android:id="@+id/continuar"
                 android:layout_width="match_parent"

@@ -40,8 +40,7 @@
         <activity
             android:name=".mainActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.MyApplication" />
+            android:theme="@style/FondoApp" />
         <activity
             android:name=".loginActivity"
             android:exported="true">

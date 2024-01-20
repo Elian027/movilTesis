@@ -38,7 +38,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Etiqueta para el asunto -->
     <TextView
         android:id="@+id/txtAsunto"
         android:layout_width="0dp"
@@ -52,7 +51,6 @@
         android:paddingStart="30dp"
         android:paddingEnd="30dp"/>
 
-    <!-- Campo para el asunto -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/aasunto"
         android:layout_width="0dp"
@@ -71,7 +69,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Campo para el contenido del mensaje -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/contenidoMensaje"
         android:layout_width="0dp"
