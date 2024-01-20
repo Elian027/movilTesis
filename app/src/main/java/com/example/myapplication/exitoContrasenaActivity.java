@@ -29,7 +29,7 @@ public class exitoContrasenaActivity extends AppCompatActivity {
     }
 
     private void limpiarID() {
-        // Limpia el ID almacenado en SharedPreferences
+        // Limpia el ID almacenado
         SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();

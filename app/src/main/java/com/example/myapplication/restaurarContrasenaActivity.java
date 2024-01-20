@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class restaurarContrasenaActivity extends AppCompatActivity {
 
@@ -64,9 +65,9 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             if (!task.getResult().isEmpty()) {
                                 String contrasenaTemporal = "STemporal01";
-                                String hashTemp = hashContrasenia.hashPassword(contrasenaTemporal);
+                                String hashTemp = BCrypt.hashpw(contrasenaTemporal, BCrypt.gensalt());
 
-                                // Actualizar la contraseña
+                                // Cambia a la contraseña temporal
                                 String userId = task.getResult().getDocuments().get(0).getId();
                                 actualizarContrasena(userId, hashTemp);
 
@@ -101,11 +102,6 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
 
-                        if (task.isSuccessful()) {
-
-                        } else {
-
-                        }
                     }
                 });
     }
