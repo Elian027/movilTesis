@@ -88,7 +88,6 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
     }
 
     private void actualizarContrasenia(String usuarioID, String nuevaPassword) {
-        // Actualiza la contraseña en la BD
         DocumentReference docRef = db.collection("Personal").document(usuarioID);
 
         Map<String, Object> updates = new HashMap<>();
@@ -97,14 +96,31 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
 
         docRef.update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    // Actualización exitosa
-                    mostrarAlertaExito(); // Mostrar alerta de éxito
+                    obtenerFecha(usuarioID);
                 })
                 .addOnFailureListener(e -> {
-                    // Manejar el fallo si es necesario
                     Toast.makeText(contrasenaNuevaActivity.this, "Error al actualizar la contraseña en la base de datos", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void obtenerFecha(String usuarioID) {
+        DocumentReference docRef = db.collection("Personal").document(usuarioID);
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                boolean fechaTrabajo = documentSnapshot.getBoolean("fecha_trabajo");
+                if (fechaTrabajo) {
+                    mostrarAlertaExito2();
+                } else {
+                    mostrarAlertaExito1();
+                }
+            } else {
+                Toast.makeText(contrasenaNuevaActivity.this, "Documento no encontrado", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(contrasenaNuevaActivity.this, "Error al obtener información del usuario", Toast.LENGTH_SHORT).show();
+        });
+    }
+
 
     private void mostrarAlerta(String titulo, String mensaje, Runnable onAceptar) {
         if (!isFinishing()) {
@@ -121,9 +137,16 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
         }
     }
 
-    private void mostrarAlertaExito() {
+    private void mostrarAlertaExito1() {
         mostrarAlerta("Éxito", "Contraseña actualizada con éxito", () -> {
             Intent irMain = new Intent(contrasenaNuevaActivity.this, fechaActivity.class);
+            startActivity(irMain);
+        });
+    }
+
+    private void mostrarAlertaExito2() {
+        mostrarAlerta("Éxito", "Contraseña actualizada con éxito", () -> {
+            Intent irMain = new Intent(contrasenaNuevaActivity.this, mainActivity.class);
             startActivity(irMain);
         });
     }

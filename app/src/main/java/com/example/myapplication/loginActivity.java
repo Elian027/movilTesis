@@ -69,7 +69,7 @@ public class loginActivity extends AppCompatActivity {
             return;
         }
 
-        // Realizar consulta en Firestore
+        // Consulta en Firestore
         db.collection("Personal")
                 .whereEqualTo("Email", emailUser)
                 .get()
@@ -83,7 +83,7 @@ public class loginActivity extends AppCompatActivity {
                                     String usuarioId = document.getId();
                                     Log.e("ID DE USUARIO", "Este es el id del usuario ingresado: " + usuarioId);
 
-                                    // Verificar si existe el campo "contrasenaCambiada"
+                                    // Verifica si existe el campo "contrasenaCambiada"
                                     if (document.contains("contrasenaCambiada")) {
                                         boolean contrasenaCambiada = document.getBoolean("contrasenaCambiada");
 
@@ -102,7 +102,7 @@ public class loginActivity extends AppCompatActivity {
                                                 mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
                                             }
                                         } else {
-                                            // La contraseña no ha sido cambiada, redirigir a la pantalla de cambio de contraseña
+                                            // La contraseña no ha sido cambiada, ir a de cambiar contraseña
                                             Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
                                             startActivity(irContrasena);
                                             finish();

@@ -15,6 +15,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class restaurarContrasenaActivity extends AppCompatActivity {
 
     TextInputLayout correoTextInputLayout;
@@ -95,9 +98,13 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
     }
 
     private void actualizarContrasena(String userId, String nuevaContrasenaTemporal) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("Contrasenia", nuevaContrasenaTemporal);
+        updates.put("contrasenaCambiada", false);
+
         db.collection("Personal")
                 .document(userId)
-                .update("Contrasenia", nuevaContrasenaTemporal)
+                .update(updates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
