@@ -119,9 +119,19 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
     }
 
     private void mostrarAlertaExito() {
+        // Obtener el valor de fecha_trabajo
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        boolean fechaTrabajo = preferences.getBoolean("fecha_trabajo", false);
+
+        // Mostrar la alerta de éxito y redirigir a la actividad correspondiente con un if
         mostrarAlerta("Éxito", "Contraseña actualizada con éxito", () -> {
-            Intent irMain = new Intent(contrasenaNuevaActivity.this, fechaActivity.class);
-            startActivity(irMain);
+            if (fechaTrabajo) {
+                Intent irMain = new Intent(contrasenaNuevaActivity.this, mainActivity.class);
+                startActivity(irMain);
+            } else {
+                Intent irFecha = new Intent(contrasenaNuevaActivity.this, fechaActivity.class);
+                startActivity(irFecha);
+            }
         });
     }
 
