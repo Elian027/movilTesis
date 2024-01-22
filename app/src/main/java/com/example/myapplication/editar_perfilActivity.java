@@ -84,9 +84,10 @@ public class editar_perfilActivity extends AppCompatActivity {
         btn_guardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                guardarCambios();
-                Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
-                startActivity(edit_to_main);
+                if (guardarCambios()) {
+                    Intent edit_to_main = new Intent(editar_perfilActivity.this, mainActivity.class);
+                    startActivity(edit_to_main);
+                }
             }
         });
 
@@ -352,22 +353,30 @@ public class editar_perfilActivity extends AppCompatActivity {
                         }
                     });
         } else {
-            // Manejar el caso cuando no se puede obtener el ID del usuario
             Toast.makeText(editar_perfilActivity.this, "Error al obtener ID del usuario", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void guardarCambios() {
-        // Obtener los valores actuales
+    private boolean guardarCambios() {
+        // Trae los valores de la BD
         String nuevoNombre = nombreET.getText().toString().trim();
         String nuevoApellido = apellidoET.getText().toString().trim();
         String nuevoCelular = celularET.getText().toString().trim();
+
+        if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoCelular.isEmpty()) {
+            Toast.makeText(this, "No se pueden agregar campos vacíos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (!nuevoCelular.matches("\\d{1,10}")) {
+            Toast.makeText(this, "Ingrese un número de teléfono válido", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         Map<String, Object> datosActualizados = new HashMap<>();
         datosActualizados.put("Nombre", nuevoNombre);
         datosActualizados.put("Apellido", nuevoApellido);
         datosActualizados.put("Telefono", nuevoCelular);
-
 
         db.collection("Personal").document(usuarioID)
                 .set(datosActualizados, SetOptions.merge())
@@ -380,6 +389,8 @@ public class editar_perfilActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(editar_perfilActivity.this, "Error al guardar cambios", Toast.LENGTH_SHORT).show();
                 });
+
+        return true;
     }
 
     private String obtenerId() {

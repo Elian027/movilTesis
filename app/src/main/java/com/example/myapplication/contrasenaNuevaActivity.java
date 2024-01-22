@@ -96,31 +96,12 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
 
         docRef.update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    obtenerFecha(usuarioID);
+                    mostrarAlertaExito();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(contrasenaNuevaActivity.this, "Error al actualizar la contraseña en la base de datos", Toast.LENGTH_SHORT).show();
                 });
     }
-
-    private void obtenerFecha(String usuarioID) {
-        DocumentReference docRef = db.collection("Personal").document(usuarioID);
-        docRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                boolean fechaTrabajo = documentSnapshot.getBoolean("fecha_trabajo");
-                if (fechaTrabajo) {
-                    mostrarAlertaExito2();
-                } else {
-                    mostrarAlertaExito1();
-                }
-            } else {
-                Toast.makeText(contrasenaNuevaActivity.this, "Documento no encontrado", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(contrasenaNuevaActivity.this, "Error al obtener información del usuario", Toast.LENGTH_SHORT).show();
-        });
-    }
-
 
     private void mostrarAlerta(String titulo, String mensaje, Runnable onAceptar) {
         if (!isFinishing()) {
@@ -137,16 +118,9 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
         }
     }
 
-    private void mostrarAlertaExito1() {
+    private void mostrarAlertaExito() {
         mostrarAlerta("Éxito", "Contraseña actualizada con éxito", () -> {
             Intent irMain = new Intent(contrasenaNuevaActivity.this, fechaActivity.class);
-            startActivity(irMain);
-        });
-    }
-
-    private void mostrarAlertaExito2() {
-        mostrarAlerta("Éxito", "Contraseña actualizada con éxito", () -> {
-            Intent irMain = new Intent(contrasenaNuevaActivity.this, mainActivity.class);
             startActivity(irMain);
         });
     }

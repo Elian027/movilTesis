@@ -24,9 +24,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
@@ -262,13 +265,18 @@ public class mainActivity extends AppCompatActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
 
-            btn_cancelar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    editarCitaController.mostrarEditarCita(context, correo[0], idDocumento);
-                    alertDialog.dismiss();
-                }
-            });
+            if ("Cancelado".equals(estado) || "Finalizado".equals(estado)) {
+                btn_cancelar.setVisibility(View.GONE);
+            } else {
+                btn_cancelar.setVisibility(View.VISIBLE);
+                btn_cancelar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        editarCitaController.mostrarEditarCita(context, correo[0], idDocumento);
+                        alertDialog.dismiss();
+                    }
+                });
+            }
         }
     }
 
@@ -301,21 +309,25 @@ public class mainActivity extends AppCompatActivity {
                     String asunto = asuntoC.getText().toString();
                     String msj = mensajeC.getText().toString();
 
-                    // Crea la instancia para enviar el correo
-                    enviarCorreo enviarCorreoTask = new enviarCorreo(context, new enviarCorreo.CorreoCallback() {
-                        @Override
-                        public void onCorreoEnviado(boolean enviado) {
-                            if (enviado) {
-                                Toast.makeText(context, "Correo enviado correctamente", Toast.LENGTH_SHORT).show();
-                                // Actualiza el estado de la cita luego de enviar el corre
-                                actualizarEstadoCita(idDocumento);
-                                alertDialog.dismiss();
-                            } else {
-                                Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show();
+                    if (msj.isEmpty()) {
+                        Toast.makeText(context, "El mensaje no debe estar vacío", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Crea la instancia para enviar el correo
+                        enviarCorreo enviarCorreoTask = new enviarCorreo(context, new enviarCorreo.CorreoCallback() {
+                            @Override
+                            public void onCorreoEnviado(boolean enviado) {
+                                if (enviado) {
+                                    Toast.makeText(context, "Correo enviado correctamente", Toast.LENGTH_SHORT).show();
+                                    // Actualiza el estado de la cita luego de enviar el corre
+                                    actualizarEstadoCita(idDocumento);
+                                    alertDialog.dismiss();
+                                } else {
+                                    Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
-                    enviarCorreoTask.execute(correoDestino, asunto, msj);
+                        });
+                        enviarCorreoTask.execute(correoDestino, asunto, msj);
+                    }
                 }
             });
         }
