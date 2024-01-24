@@ -2,7 +2,10 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +39,8 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
         btnRecuperarContrasena = findViewById(R.id.btnRecuperarContrasena);
         btn_atras = findViewById(R.id.atras);
 
+        limpiarDatos();
+
         btnRecuperarContrasena.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -56,6 +61,14 @@ public class restaurarContrasenaActivity extends AppCompatActivity {
                 startActivity(irLogin);
             }
         });
+    }
+
+    private void limpiarDatos() {
+        // Limpia el ID almacenado
+        SharedPreferences preferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     private void verificarCorreo(String email) {

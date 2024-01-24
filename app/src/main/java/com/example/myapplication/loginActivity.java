@@ -83,59 +83,101 @@ public class loginActivity extends AppCompatActivity {
                                     String usuarioId = document.getId();
                                     Log.e("ID DE USUARIO", "Este es el id del usuario ingresado: " + usuarioId);
 
-                                    // Verifica si existe el campo "contrasenaCambiada"
-                                    if (document.contains("contrasenaCambiada")) {
-                                        boolean contrasenaCambiada = document.getBoolean("contrasenaCambiada");
+                                    // Verifica si existe el campo "hashPass"
+                                    if (document.contains("hashPass")) {
+                                        boolean usarHashPass = document.getBoolean("hashPass");
 
-                                        if (contrasenaCambiada) {
-                                            // La contraseña ha sido cambiada, verificar el hash
+                                        if (usarHashPass) {
+                                            // La contraseña debe ser verificada con el hash almacenado
                                             String contraseniaAlmacenada = document.getString("Contrasenia");
 
                                             if (contraseniaAlmacenada != null && BCrypt.checkpw(passUser, contraseniaAlmacenada)) {
                                                 // Contraseña correcta
-                                                startActivity(new Intent(loginActivity.this, mainActivity.class));
-                                                Toast.makeText(loginActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                                                finish();
+                                                verificarContrasena(document);
                                             } else {
-                                                // Contraseña o correo incorrectos
+                                                // Contraseña incorrecta
                                                 password.setText("");
                                                 mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
                                             }
                                         } else {
-                                            // La contraseña no ha sido cambiada, ir a de cambiar contraseña
-                                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
-                                            startActivity(irContrasena);
-                                            finish();
+                                            // La contraseña se almacena como texto plano
+                                            String contraseniaAlmacenada = document.getString("Contrasenia");
+                                            if (contraseniaAlmacenada != null && contraseniaAlmacenada.equals(passUser)) {
+                                                verificarContrasena(document);
+                                            } else {
+                                                password.setText("");
+                                                mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
+                                            }
                                         }
                                     } else {
+                                        // No existe el campo "hashPass", asumir que la contraseña se almacena como texto plano
                                         String contraseniaAlmacenada = document.getString("Contrasenia");
                                         if (contraseniaAlmacenada != null && contraseniaAlmacenada.equals(passUser)) {
-                                            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
-                                            startActivity(irContrasena);
-                                            finish();
+                                            verificarContrasena(document);
                                         } else {
                                             password.setText("");
                                             mostrarAlerta("Error de inicio de sesión", "Contraseña o correo incorrectos");
                                         }
                                     }
-
-                                    // Guardar el ID del usuario
-                                    guardarID(usuarioId);
                                 }
                             } else {
                                 // Usuario no encontrado en la base de datos
                                 mostrarAlerta("Error de inicio de sesión", "El usuario no está registrado");
                                 password.setText("");
                             }
-                        } else {
-                            mostrarAlerta("Error de inicio de sesión", "Error al verificar el correo en la base de datos");
                         }
                     }
                 });
     }
 
+    private void verificarContrasena(QueryDocumentSnapshot document) {
+        String usuarioID = document.getId();
+        // Verifica si existe el campo "contrasenaCambiada"
+        if (document.contains("contrasenaCambiada")) {
+            boolean contrasenaCambiada = document.getBoolean("contrasenaCambiada");
 
+            if (contrasenaCambiada) {
+                // La contraseña ha sido cambiada, continuar con las demás validaciones
+                verificarFechaTrabajo(document);
+                guardarID(usuarioID);
+            } else {
+                // La contraseña no ha sido cambiada, ir a cambiar contraseña
+                Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+                startActivity(irContrasena);
+                finish();
+                guardarID(usuarioID);
+            }
+        } else {
+            // El campo "contrasenaCambiada" no existe, asumir que es falso
+            Intent irContrasena = new Intent(loginActivity.this, contrasenaNuevaActivity.class);
+            startActivity(irContrasena);
+            finish();
+            guardarID(usuarioID);
+        }
+    }
 
+    private void verificarFechaTrabajo(QueryDocumentSnapshot document) {
+        // Verifica el valor del campo "fecha_trabajo"
+        if (document.contains("fecha_trabajo")) {
+            boolean fechaTrabajo = document.getBoolean("fecha_trabajo");
+
+            if (fechaTrabajo) {
+                // La fecha de trabajo es verdadera, ir a mainActivity
+                Intent irMain = new Intent(loginActivity.this, mainActivity.class);
+                startActivity(irMain);
+
+                finish();
+            } else {
+                Intent irFecha = new Intent(loginActivity.this, fechaActivity.class);
+                startActivity(irFecha);
+                finish();
+            }
+        } else {
+            Intent irFecha = new Intent(loginActivity.this, fechaActivity.class);
+            startActivity(irFecha);
+            finish();
+        }
+    }
 
     private void guardarID(String usuarioId) {
         // Almacenar las credenciales

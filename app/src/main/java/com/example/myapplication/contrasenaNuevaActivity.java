@@ -92,6 +92,7 @@ public class contrasenaNuevaActivity extends AppCompatActivity {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("Contrasenia", nuevaPassword);
+        updates.put("hashPass", true);
         updates.put("contrasenaCambiada", true);
 
         docRef.update(updates)
